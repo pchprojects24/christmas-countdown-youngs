@@ -229,7 +229,7 @@
   function updateStatusBanner() {
     const now = new Date();
     const day = now.getDate();
-    const month = now.getMonth(); // 11 is December
+    const month = now.getMonth(); 
     const banner = document.getElementById('liveStatus');
     let msg = "";
 
@@ -267,7 +267,8 @@
       
       let html = `<ul class="sub-itinerary">`;
       ev.subTasks.forEach(task => { html += `<li>${task}</li>`; });
-      if (ev.hubLink) html += `<a href="${ev.hubLink}" class="hub-btn">Enter Hub ➔</a>`;
+      // STOP PROPAGATION added to the hub-btn link
+      if (ev.hubLink) html += `<a href="${ev.hubLink}" class="hub-btn" onclick="event.stopPropagation();">Enter Hub ➔</a>`;
       html += `</ul>`;
 
       row.innerHTML = `
