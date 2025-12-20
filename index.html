@@ -58,6 +58,7 @@
     .c-btn { 
       font-size: 10px; text-decoration: none; color: white; border: 1px solid var(--border); 
       padding: 6px; border-radius: 5px; background: rgba(255,255,255,0.05);
+      min-height: 44px; display: flex; align-items: center; justify-content: center;
     }
 
     /* Cards */
@@ -112,12 +113,11 @@
     /* Mobile Responsiveness for Contact Grid */
     @media (max-width: 400px) {
       .contact-grid { grid-template-columns: 1fr; gap: 12px; }
-      .c-btn { font-size: 11px; padding: 8px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+      .c-btn { font-size: 12px; padding: 8px; }
     }
     
     @media (min-width: 401px) and (max-width: 600px) {
       .contact-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .c-btn { min-height: 44px; display: flex; align-items: center; justify-content: center; }
     }
   </style>
 </head>
