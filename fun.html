@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fun Zone - The Youngs' Christmas</title>
+  <style>
+    :root {
+      --bg: #050a06;
+      --card: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --accent: #d4af37;
+      --holiday-red: #991b1b;
+      --border: rgba(255, 255, 255, 0.15);
+      --nice-green: #22c55e;
+      --naughty-red: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: radial-gradient(circle at top, #142b1a, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .snowflake { position: absolute; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; }
+    @keyframes fall { to { transform: translateY(105vh); } }
+
+    .wrap { max-width: 650px; margin: 0 auto; padding: 20px 15px; position: relative; z-index: 1; }
+
+    .site-header { text-align: center; margin-bottom: 20px; }
+    .header-top { display: block; font-size: 18px; color: var(--accent); text-transform: uppercase; letter-spacing: 4px; font-weight: 700; opacity: 0.9; }
+    .header-bottom { display: block; font-size: 34px; font-weight: 800; color: var(--accent); text-shadow: 0 0 15px var(--accent); margin-top: 5px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 15px;
+      backdrop-filter: blur(12px);
+    }
+    .label { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 12px; }
+
+    .btn {
+      background: var(--holiday-red);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      font-family: 'Georgia', serif;
+      font-size: 16px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .btn:active { transform: scale(0.98); }
+    .btn-gold { background: var(--accent); color: black; text-decoration: none; }
+    .btn-small { padding: 10px 16px; width: auto; font-size: 14px; display: inline-block; }
+
+    .back-link {
+      display: inline-block;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    /* Naughty or Nice Meter */
+    .family-member {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .member-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .meter-container {
+      background: linear-gradient(to right, var(--naughty-red), var(--nice-green));
+      height: 30px;
+      border-radius: 15px;
+      position: relative;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .meter-indicator {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: left 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .meter-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .naughty-label { color: var(--naughty-red); }
+    .nice-label { color: var(--nice-green); }
+    .vote-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .vote-btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      transition: transform 0.1s;
+    }
+    .vote-btn:hover { transform: scale(1.05); }
+    .vote-naughty { background: var(--naughty-red); color: white; }
+    .vote-nice { background: var(--nice-green); color: white; }
+    .vote-count {
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    /* Elf Name Generator */
+    .elf-input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: white;
+      font-family: 'Georgia', serif;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .elf-input::placeholder { color: #888; }
+    .elf-result {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(145deg, var(--holiday-red), #600);
+      border-radius: 12px;
+      margin-top: 15px;
+      display: none;
+    }
+    .elf-result.show { display: block; animation: popIn 0.4s ease; }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .elf-title { font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+    .elf-name { font-size: 28px; font-weight: bold; margin-top: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
+    /* Pun Generator */
+    .pun-display {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+    }
+    .pun-setup {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #ddd;
+    }
+    .pun-punchline {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .pun-punchline.show { opacity: 1; }
+    .pun-emoji {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .footer-line { text-align: center; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 30px; padding-bottom: 20px; }
+
+    @media (max-width: 600px) {
+      .header-bottom { font-size: 28px; }
+      .elf-name { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="snow-container" id="snow"></div>
+
+<div class="wrap">
+  <a href="index.html" class="back-link">← Back to Hub</a>
+
+  <header class="site-header">
+    <span class="header-top">The Youngs'</span>
+    <span class="header-bottom">🎉 Fun Zone 🎉</span>
+  </header>
+
+  <!-- Naughty or Nice Meter -->
+  <div class="card">
+    <div class="label">Naughty or Nice Meter</div>
+    <p style="font-size: 13px; color: #aaa; margin-bottom: 15px; text-align: center;">
+      Vote on who's been naughty or nice this year!
+    </p>
+    <div id="familyMeters"></div>
+  </div>
+
+  <!-- Elf Name Generator -->
+  <div class="card">
+    <div class="label">Elf Name Generator</div>
+    <p style="font-size: 13px; color: #aaa; margin-bottom: 15px; text-align: center;">
+      Discover your official North Pole identity!
+    </p>
+    <input type="text" id="humanName" class="elf-input" placeholder="Enter your name..." maxlength="30">
+    <button class="btn btn-gold" onclick="generateElfName()">✨ Reveal My Elf Name</button>
+    <div class="elf-result" id="elfResult">
+      <div class="elf-title">Your Official Elf Name Is</div>
+      <div class="elf-name" id="elfNameDisplay"></div>
+    </div>
+  </div>
+
+  <!-- Christmas Pun Generator -->
+  <div class="card">
+    <div class="label">Christmas Pun Generator</div>
+    <p style="font-size: 13px; color: #aaa; margin-bottom: 15px; text-align: center;">
+      Warning: These jokes are snow laughing matter!
+    </p>
+    <div class="pun-display" id="punDisplay">
+      <div class="pun-emoji" id="punEmoji">🎅</div>
+      <div class="pun-setup" id="punSetup">Click the button for a festive joke!</div>
+      <div class="pun-punchline" id="punPunchline"></div>
+    </div>
+    <button class="btn" onclick="generatePun()">🎄 Tell Me a Joke!</button>
+  </div>
+
+  <a href="index.html" class="btn btn-gold">🏠 Return to Christmas Hub</a>
+
+  <div class="footer-line">Made with holiday cheer for the Young family</div>
+</div>
+
+<script>
+  // ===== NAUGHTY OR NICE METER =====
+  const familyMembers = [
+    { name: "Chad", nice: 7, naughty: 3 },
+    { name: "Mona", nice: 9, naughty: 1 },
+    { name: "Marice", nice: 8, naughty: 2 }
+  ];
+
+  // Load saved votes from localStorage
+  function loadVotes() {
+    const saved = localStorage.getItem('youngsNaughtyNice');
+    if (saved) {
+      const data = JSON.parse(saved);
+      familyMembers.forEach(member => {
+        if (data[member.name]) {
+          member.nice = data[member.name].nice;
+          member.naughty = data[member.name].naughty;
+        }
+      });
+    }
+  }
+
+  function saveVotes() {
+    const data = {};
+    familyMembers.forEach(member => {
+      data[member.name] = { nice: member.nice, naughty: member.naughty };
+    });
+    localStorage.setItem('youngsNaughtyNice', JSON.stringify(data));
+  }
+
+  function getMeterPosition(member) {
+    const total = member.nice + member.naughty;
+    if (total === 0) return 50;
+    return (member.nice / total) * 100;
+  }
+
+  function getVerdict(member) {
+    const pos = getMeterPosition(member);
+    if (pos >= 70) return "🎁";
+    if (pos >= 50) return "😇";
+    if (pos >= 30) return "😈";
+    return "�ite石炭";
+  }
+
+  function renderMeters() {
+    const container = document.getElementById('familyMeters');
+    container.innerHTML = '';
+
+    familyMembers.forEach((member, idx) => {
+      const pos = getMeterPosition(member);
+      const total = member.nice + member.naughty;
+      const verdict = pos >= 50 ? "🎁" : "🪨";
+
+      const div = document.createElement('div');
+      div.className = 'family-member';
+      div.innerHTML = `
+        <div class="member-name">${member.name}</div>
+        <div class="meter-container">
+          <div class="meter-indicator" style="left: ${pos}%">${verdict}</div>
+        </div>
+        <div class="meter-labels">
+          <span class="naughty-label">🪨 Naughty</span>
+          <span class="nice-label">Nice 🎁</span>
+        </div>
+        <div class="vote-buttons">
+          <button class="vote-btn vote-naughty" onclick="vote(${idx}, 'naughty')">👎 Naughty</button>
+          <button class="vote-btn vote-nice" onclick="vote(${idx}, 'nice')">👍 Nice</button>
+        </div>
+        <div class="vote-count">${total} votes cast</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function vote(memberIdx, type) {
+    familyMembers[memberIdx][type]++;
+    saveVotes();
+    renderMeters();
+  }
+
+  // ===== ELF NAME GENERATOR =====
+  const elfFirstNames = [
+    "Sparkle", "Jingle", "Twinkle", "Snowflake", "Pepper", "Sugarplum",
+    "Tinsel", "Mistletoe", "Cinnamon", "Cocoa", "Frosty", "Nutmeg",
+    "Ginger", "Holly", "Jolly", "Merry", "Snowy", "Candy", "Glitter",
+    "Sprinkle", "Shimmer", "Dash", "Blitzen", "Comet", "Cupid"
+  ];
+
+  const elfMiddleNames = [
+    "Mc", "Von", "Sugar", "Frost", "Snow", "Jingle", "Candy", "Cookie",
+    "Sparkle", "Twinkle", "Star", "Berry", "Mint", "Cocoa"
+  ];
+
+  const elfLastNames = [
+    "Jinglebottom", "Snowtoes", "Sugarplum", "Frostwhisker", "Candycane",
+    "Northpole", "Elfington", "Twinkletoes", "Merryweather", "Peppermint",
+    "Gingerbread", "Icicleton", "Starshine", "Winterberry", "Sleighbell",
+    "Mistletoes", "Cookiesworth", "Snowdrift", "Caroltune", "Reindeerhart"
+  ];
+
+  function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  }
+
+  function generateElfName() {
+    const input = document.getElementById('humanName').value.trim();
+    if (!input) {
+      alert("Please enter your name first!");
+      return;
+    }
+
+    const hash = hashString(input.toLowerCase());
+    const firstName = elfFirstNames[hash % elfFirstNames.length];
+    const middleName = elfMiddleNames[(hash >> 4) % elfMiddleNames.length];
+    const lastName = elfLastNames[(hash >> 8) % elfLastNames.length];
+
+    const elfName = `${firstName} ${middleName}${lastName}`;
+
+    document.getElementById('elfNameDisplay').textContent = elfName;
+    document.getElementById('elfResult').classList.add('show');
+  }
+
+  // Allow Enter key to generate name
+  document.getElementById('humanName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') generateElfName();
+  });
+
+  // ===== CHRISTMAS PUN GENERATOR =====
+  const christmasPuns = [
+    { setup: "What do you call an obnoxious reindeer?", punchline: "Rude-olph!", emoji: "🦌" },
+    { setup: "Why was the snowman looking through the carrots?", punchline: "He was picking his nose!", emoji: "⛄" },
+    { setup: "What do elves learn in school?", punchline: "The elf-abet!", emoji: "🧝" },
+    { setup: "What do you call a cat on Christmas Eve?", punchline: "Sandy Claws!", emoji: "🐱" },
+    { setup: "Why did the Christmas tree go to the barber?", punchline: "It needed to be trimmed!", emoji: "🎄" },
+    { setup: "What do snowmen eat for breakfast?", punchline: "Frosted Flakes!", emoji: "❄️" },
+    { setup: "What's every parent's favorite Christmas carol?", punchline: "Silent Night!", emoji: "😴" },
+    { setup: "Why is Christmas just like a day at the office?", punchline: "You do all the work and the fat guy in the suit gets all the credit!", emoji: "🎅" },
+    { setup: "What do you call people who are afraid of Santa Claus?", punchline: "Claustrophobic!", emoji: "😱" },
+    { setup: "Why does Santa go down chimneys?", punchline: "Because it soots him!", emoji: "🏠" },
+    { setup: "What's the best thing to put into a Christmas cake?", punchline: "Your teeth!", emoji: "🎂" },
+    { setup: "What do you get when you cross a snowman with a vampire?", punchline: "Frostbite!", emoji: "🧛" },
+    { setup: "Why did the gingerbread man go to the doctor?", punchline: "He was feeling crummy!", emoji: "🍪" },
+    { setup: "What do you call Santa when he stops moving?", punchline: "Santa Pause!", emoji: "⏸️" },
+    { setup: "What nationality is Santa Claus?", punchline: "North Polish!", emoji: "🇵🇱" },
+    { setup: "What do hip hop artists do on Christmas?", punchline: "Unwrap!", emoji: "🎤" },
+    { setup: "What's a sheep's favorite Christmas song?", punchline: "Fleece Navidad!", emoji: "🐑" },
+    { setup: "How does a snowman get to work?", punchline: "By icicle!", emoji: "🚲" },
+    { setup: "What do you call an elf who sings?", punchline: "A wrapper!", emoji: "🎁" },
+    { setup: "Why did no one bid for Rudolph and Blitzen on eBay?", punchline: "They were two deer!", emoji: "💰" },
+    { setup: "What did Adam say the day before Christmas?", punchline: "It's Christmas, Eve!", emoji: "🍎" },
+    { setup: "What does Santa suffer from if he gets stuck in a chimney?", punchline: "Claustrophobia!", emoji: "😰" },
+    { setup: "Why are Christmas trees so bad at knitting?", punchline: "They always drop their needles!", emoji: "🧶" },
+    { setup: "What did one snowman say to the other?", punchline: "Do you smell carrots?", emoji: "🥕" }
+  ];
+
+  let lastPunIndex = -1;
+  let punchlineShown = false;
+
+  function generatePun() {
+    const btn = document.querySelector('.card:last-of-type .btn');
+
+    if (punchlineShown) {
+      // Get a new pun
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * christmasPuns.length);
+      } while (newIndex === lastPunIndex && christmasPuns.length > 1);
+
+      lastPunIndex = newIndex;
+      const pun = christmasPuns[newIndex];
+
+      document.getElementById('punEmoji').textContent = pun.emoji;
+      document.getElementById('punSetup').textContent = pun.setup;
+      document.getElementById('punPunchline').textContent = pun.punchline;
+      document.getElementById('punPunchline').classList.remove('show');
+      btn.textContent = "😂 Show Punchline!";
+      punchlineShown = false;
+    } else if (lastPunIndex === -1) {
+      // First click - get a pun
+      lastPunIndex = Math.floor(Math.random() * christmasPuns.length);
+      const pun = christmasPuns[lastPunIndex];
+
+      document.getElementById('punEmoji').textContent = pun.emoji;
+      document.getElementById('punSetup').textContent = pun.setup;
+      document.getElementById('punPunchline').textContent = pun.punchline;
+      btn.textContent = "😂 Show Punchline!";
+    } else {
+      // Show punchline
+      document.getElementById('punPunchline').classList.add('show');
+      btn.textContent = "🎄 Another Joke!";
+      punchlineShown = true;
+    }
+  }
+
+  // ===== SNOWFALL =====
+  function createSnow() {
+    const container = document.getElementById('snow');
+    for (let i = 0; i < 40; i++) {
+      let flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.textContent = '❄';
+      flake.style.left = Math.random() * 100 + 'vw';
+      flake.style.animationDuration = (Math.random() * 5 + 7) + 's';
+      container.appendChild(flake);
+    }
+  }
+
+  // Initialize
+  loadVotes();
+  renderMeters();
+  createSnow();
+</script>
+</body>
+</html>
