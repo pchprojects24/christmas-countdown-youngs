@@ -29,6 +29,11 @@
     .snowflake { position: absolute; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; }
     @keyframes fall { to { transform: translateY(105vh); } }
 
+    /* Respect user's motion preferences for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .snowflake { animation: none; opacity: 0.4; }
+    }
+
     .wrap { max-width: 650px; margin: 0 auto; padding: 20px 15px; position: relative; z-index: 1; }
 
     /* Header */
@@ -309,6 +314,10 @@
   }
 
   function createSnow() {
+    // Skip snow animation entirely if user prefers reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
     const container = document.getElementById('snow');
     for (let i = 0; i < 40; i++) {
       let flake = document.createElement('div');
