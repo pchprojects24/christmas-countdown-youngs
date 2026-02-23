@@ -2,11 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Super Mario Bros 2 Clone</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Portrait-mode warning (touch devices only) -->
+  <div id="portrait-warning">
+    <div id="portrait-inner">
+      <div id="rotate-icon">⟳</div>
+      <p>Rotate your phone<br>to landscape to play</p>
+    </div>
+  </div>
+
   <div id="game-container">
     <!-- Character Select Screen -->
     <div id="screen-select" class="screen active">
@@ -21,7 +32,7 @@
             <span>Jump: ★★★☆</span>
             <span>Lift: ★★★☆</span>
           </div>
-          <div class="char-desc">All-around hero. Great balance of speed and jumping ability.</div>
+          <div class="char-desc">All-around hero.</div>
         </div>
         <div class="char-card" data-char="luigi">
           <canvas class="char-preview" width="64" height="64" data-char="luigi"></canvas>
@@ -31,7 +42,7 @@
             <span>Jump: ★★★★</span>
             <span>Lift: ★★★☆</span>
           </div>
-          <div class="char-desc">Floaty jump and long air-time. Great for tricky platforms.</div>
+          <div class="char-desc">Floaty high jump.</div>
         </div>
         <div class="char-card" data-char="toad">
           <canvas class="char-preview" width="64" height="64" data-char="toad"></canvas>
@@ -41,7 +52,7 @@
             <span>Jump: ★★☆☆</span>
             <span>Lift: ★★★★</span>
           </div>
-          <div class="char-desc">Fastest runner, strongest lifter. Short jump height.</div>
+          <div class="char-desc">Fastest & strongest.</div>
         </div>
         <div class="char-card" data-char="peach">
           <canvas class="char-preview" width="64" height="64" data-char="peach"></canvas>
@@ -51,10 +62,10 @@
             <span>Jump: ★★★☆</span>
             <span>Lift: ★★☆☆</span>
           </div>
-          <div class="char-desc">Float ability! Hold jump to glide through the air.</div>
+          <div class="char-desc">Hold A to float!</div>
         </div>
       </div>
-      <p class="hint-text">Click a character or press 1-4 to select</p>
+      <p class="hint-text">Tap a character to play</p>
     </div>
 
     <!-- Game Screen -->
@@ -66,15 +77,32 @@
         <div class="hud-item"><span class="hud-label">LIVES</span><span id="hud-lives">♥♥♥</span></div>
         <div class="hud-item"><span class="hud-label">HP</span><span id="hud-hp">●●●</span></div>
       </div>
-      <canvas id="game-canvas"></canvas>
-      <div id="mobile-controls">
-        <div id="dpad">
-          <button class="dpad-btn" id="btn-left">◀</button>
-          <button class="dpad-btn" id="btn-right">▶</button>
-        </div>
-        <div id="action-btns">
-          <button class="action-btn" id="btn-run">B</button>
-          <button class="action-btn" id="btn-jump">A</button>
+
+      <div id="canvas-wrap">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Touch overlay — covers canvas-wrap, handles all touch input -->
+        <div id="touch-overlay">
+          <!-- Left: directional zone -->
+          <div id="dpad-zone">
+            <div class="dpad-half" id="dpad-left"><span class="dpad-arrow">◀</span></div>
+            <div class="dpad-half" id="dpad-right"><span class="dpad-arrow">▶</span></div>
+          </div>
+
+          <!-- Right: action buttons -->
+          <div id="action-zone">
+            <div class="action-circle" id="btn-b">
+              <span class="btn-label">B</span>
+              <span class="btn-sub">RUN/THROW</span>
+            </div>
+            <div class="action-circle" id="btn-a">
+              <span class="btn-label">A</span>
+              <span class="btn-sub">JUMP</span>
+            </div>
+          </div>
+
+          <!-- Pause -->
+          <button id="btn-pause-touch" aria-label="Pause">⏸</button>
         </div>
       </div>
     </div>
