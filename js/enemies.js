@@ -95,6 +95,16 @@ class ShyGuy extends Enemy {
     return map[this.color] || '#e83a00';
   }
 
+  _getDarkColor() {
+    const map = { red: '#b02800', blue: '#2a4acc', pink: '#cc4080', green: '#1a7a00' };
+    return map[this.color] || '#b02800';
+  }
+
+  _getLightColor() {
+    const map = { red: '#ff5a20', blue: '#5a8aff', pink: '#ff90c0', green: '#3abe20' };
+    return map[this.color] || '#ff5a20';
+  }
+
   update(level, player, game) {
     if (this.dead) return;
     if (this.thrown && !this.carried) {
@@ -140,6 +150,9 @@ class ShyGuy extends Enemy {
     const sx = this.x - camX;
     const sy = this.y;
     const c = this._getColor();
+    // Derive darker/lighter shades from the base color
+    const cDark = this._getDarkColor();
+    const cLight = this._getLightColor();
 
     ctx.save();
     if (this.facingDir === -1) {
@@ -148,32 +161,76 @@ class ShyGuy extends Enemy {
       ctx.translate(-sx, 0);
     }
 
-    // Robe
+    // Robe body
     ctx.fillStyle = c;
     ctx.fillRect(sx+2, sy+10, this.w-4, this.h-10);
+    // Robe shading
+    ctx.fillStyle = cDark;
+    ctx.fillRect(sx+2, sy+10, 3, this.h-10);
+    ctx.fillRect(sx+this.w-5, sy+10, 3, this.h-10);
+    // Robe highlight
+    ctx.fillStyle = cLight;
+    ctx.fillRect(sx+8, sy+12, 6, this.h-16);
+    // Robe belt
+    ctx.fillStyle = cDark;
+    ctx.fillRect(sx+3, sy+18, this.w-6, 2);
     // Head
     ctx.fillStyle = '#f9d8b0';
     ctx.beginPath();
     ctx.arc(sx+this.w/2, sy+9, 10, 0, Math.PI*2);
     ctx.fill();
+    // Face highlight
+    ctx.fillStyle = '#fde8c8';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-2, sy+8, 5, 0, Math.PI*2);
+    ctx.fill();
     // Mask
     ctx.fillStyle = '#fff';
     ctx.fillRect(sx+4, sy+5, this.w-8, 10);
+    // Mask border
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(sx+4, sy+5, this.w-8, 1);
+    ctx.fillRect(sx+4, sy+14, this.w-8, 1);
+    // Eye holes (dark)
     ctx.fillStyle = '#000';
-    ctx.fillRect(sx+5, sy+7, 5, 4);
-    ctx.fillRect(sx+this.w-10, sy+7, 5, 4);
+    ctx.fillRect(sx+5, sy+7, 6, 4);
+    ctx.fillRect(sx+this.w-11, sy+7, 6, 4);
+    // Eye pupils (white dots)
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(sx+8, sy+8, 2, 2);
+    ctx.fillRect(sx+this.w-8, sy+8, 2, 2);
     // Hood
     ctx.fillStyle = c;
     ctx.fillRect(sx, sy+2, this.w, 8);
+    // Hood highlight
+    ctx.fillStyle = cLight;
+    ctx.fillRect(sx+6, sy+3, 8, 3);
+    // Hood point
     ctx.beginPath();
     ctx.moveTo(sx+this.w/2-6, sy+2);
-    ctx.lineTo(sx+this.w/2, sy-4);
+    ctx.lineTo(sx+this.w/2, sy-5);
     ctx.lineTo(sx+this.w/2+6, sy+2);
+    ctx.fillStyle = c;
+    ctx.fill();
+    // Hood point highlight
+    ctx.beginPath();
+    ctx.moveTo(sx+this.w/2-3, sy+2);
+    ctx.lineTo(sx+this.w/2, sy-3);
+    ctx.lineTo(sx+this.w/2+3, sy+2);
+    ctx.fillStyle = cLight;
     ctx.fill();
     // Feet
     ctx.fillStyle = '#3d1c00';
-    ctx.fillRect(sx+4, sy+this.h-4, 8, 4);
-    ctx.fillRect(sx+this.w-12, sy+this.h-4, 8, 4);
+    ctx.fillRect(sx+3, sy+this.h-5, 9, 5);
+    ctx.fillRect(sx+this.w-12, sy+this.h-5, 9, 5);
+    // Shoe highlight
+    ctx.fillStyle = '#5a3010';
+    ctx.fillRect(sx+4, sy+this.h-5, 5, 2);
+    ctx.fillRect(sx+this.w-11, sy+this.h-5, 5, 2);
+    // Shoe sole
+    ctx.fillStyle = '#2a1200';
+    ctx.fillRect(sx+3, sy+this.h-1, 9, 1);
+    ctx.fillRect(sx+this.w-12, sy+this.h-1, 9, 1);
 
     ctx.restore();
     this.drawStunStars(ctx, camX);
@@ -242,21 +299,61 @@ class Ninji extends Enemy {
     // Body
     ctx.fillStyle = '#111';
     ctx.fillRect(sx+2, sy+8, this.w-4, this.h-8);
+    // Body highlight/shading
+    ctx.fillStyle = '#1a1a2a';
+    ctx.fillRect(sx+6, sy+10, this.w-12, this.h-14);
     // Head
     ctx.fillStyle = '#111';
     ctx.beginPath();
     ctx.arc(sx+this.w/2, sy+8, 10, 0, Math.PI*2);
     ctx.fill();
-    // Eyes (white gleam)
+    // Head highlight
+    ctx.fillStyle = '#1a1a2a';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-2, sy+6, 5, 0, Math.PI*2);
+    ctx.fill();
+    // Pointed ears/horns
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.moveTo(sx+3, sy+4);
+    ctx.lineTo(sx+1, sy-2);
+    ctx.lineTo(sx+7, sy+4);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(sx+this.w-7, sy+4);
+    ctx.lineTo(sx+this.w-1, sy-2);
+    ctx.lineTo(sx+this.w-3, sy+4);
+    ctx.fill();
+    // Eyes (white gleam patches)
     ctx.fillStyle = '#fff';
-    ctx.fillRect(sx+5, sy+5, 4, 4);
-    ctx.fillRect(sx+this.w-9, sy+5, 4, 4);
+    ctx.fillRect(sx+5, sy+4, 5, 5);
+    ctx.fillRect(sx+this.w-10, sy+4, 5, 5);
+    // Pupils (yellow/menacing)
     ctx.fillStyle = '#ff0';
-    ctx.fillRect(sx+6, sy+6, 2, 2);
-    ctx.fillRect(sx+this.w-8, sy+6, 2, 2);
+    ctx.fillRect(sx+6, sy+5, 3, 3);
+    ctx.fillRect(sx+this.w-9, sy+5, 3, 3);
+    // Pupil center
+    ctx.fillStyle = '#f80';
+    ctx.fillRect(sx+7, sy+6, 1, 1);
+    ctx.fillRect(sx+this.w-8, sy+6, 1, 1);
     // Belt
     ctx.fillStyle = '#c84800';
     ctx.fillRect(sx+2, sy+16, this.w-4, 3);
+    // Belt buckle
+    ctx.fillStyle = '#ffe04b';
+    ctx.fillRect(sx+this.w/2-2, sy+16, 4, 3);
+    // Arms (small)
+    ctx.fillStyle = '#111';
+    ctx.fillRect(sx, sy+12, 3, 6);
+    ctx.fillRect(sx+this.w-3, sy+12, 3, 6);
+    // Feet
+    ctx.fillStyle = '#1a1a2a';
+    ctx.fillRect(sx+2, sy+this.h-4, 7, 4);
+    ctx.fillRect(sx+this.w-9, sy+this.h-4, 7, 4);
+    // Foot claws
+    ctx.fillStyle = '#333';
+    ctx.fillRect(sx+1, sy+this.h-2, 2, 2);
+    ctx.fillRect(sx+this.w-3, sy+this.h-2, 2, 2);
     this.drawStunStars(ctx, camX);
   }
 }
@@ -342,30 +439,91 @@ class Snifit extends Enemy {
     if (this.dead) return;
     const sx = this.x - camX;
     const sy = this.y;
-    // Mask body
+
+    ctx.save();
+    if (this.facingDir === -1) {
+      ctx.translate(sx + this.w, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-sx, 0);
+    }
+
+    // Robe/body (like ShyGuy but darker)
+    ctx.fillStyle = '#444';
+    ctx.fillRect(sx+2, sy+12, this.w-4, this.h-12);
+    // Body shading
+    ctx.fillStyle = '#333';
+    ctx.fillRect(sx+2, sy+12, 3, this.h-12);
+    ctx.fillRect(sx+this.w-5, sy+12, 3, this.h-12);
+    // Body highlight
+    ctx.fillStyle = '#555';
+    ctx.fillRect(sx+8, sy+14, 6, this.h-18);
+    // Head
     ctx.fillStyle = '#555';
     ctx.beginPath();
-    ctx.arc(sx+this.w/2, sy+this.h/2, this.w/2-2, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2, sy+10, 11, 0, Math.PI*2);
     ctx.fill();
-    // Face plate
-    ctx.fillStyle = '#888';
+    // Head highlight
+    ctx.fillStyle = '#666';
     ctx.beginPath();
-    ctx.arc(sx+this.w/2, sy+this.h/2-2, 9, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2-2, sy+8, 6, 0, Math.PI*2);
     ctx.fill();
-    // Snout hole
-    ctx.fillStyle = '#222';
+    // Mask (like ShyGuy mask but darker)
+    ctx.fillStyle = '#777';
+    ctx.fillRect(sx+4, sy+6, this.w-8, 10);
+    // Mask border
+    ctx.fillStyle = '#999';
+    ctx.fillRect(sx+4, sy+6, this.w-8, 1);
+    // Eye holes
+    ctx.fillStyle = '#000';
+    ctx.fillRect(sx+5, sy+7, 5, 4);
+    ctx.fillRect(sx+this.w-10, sy+7, 5, 4);
+    // Eye glow
+    ctx.fillStyle = '#ff4';
+    ctx.fillRect(sx+6, sy+8, 3, 2);
+    ctx.fillRect(sx+this.w-9, sy+8, 3, 2);
+    // Snout/cannon
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2, sy+this.h/2+2, 6, 0, Math.PI*2);
+    ctx.fill();
+    // Cannon opening
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2, sy+this.h/2+2, 3, 0, Math.PI*2);
+    ctx.fill();
+    // Cannon rim
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(sx+this.w/2, sy+this.h/2+2, 5, 0, Math.PI*2);
-    ctx.fill();
-    // Eyes
-    ctx.fillStyle = '#ff4';
-    ctx.fillRect(sx+5, sy+6, 4, 4);
-    ctx.fillRect(sx+this.w-9, sy+6, 4, 4);
-    // Projectiles
+    ctx.stroke();
+    // Feet
+    ctx.fillStyle = '#333';
+    ctx.fillRect(sx+3, sy+this.h-4, 8, 4);
+    ctx.fillRect(sx+this.w-11, sy+this.h-4, 8, 4);
+    // Shoe sole
+    ctx.fillStyle = '#222';
+    ctx.fillRect(sx+3, sy+this.h-1, 8, 1);
+    ctx.fillRect(sx+this.w-11, sy+this.h-1, 8, 1);
+
+    ctx.restore();
+
+    // Projectiles (drawn without transform)
     for (const p of this.projectiles) {
+      // Outer glow
+      ctx.fillStyle = 'rgba(255,136,68,0.3)';
+      ctx.beginPath();
+      ctx.arc(p.x - camX + p.w/2, p.y + p.h/2, 7, 0, Math.PI*2);
+      ctx.fill();
+      // Main projectile
       ctx.fillStyle = '#f84';
       ctx.beginPath();
       ctx.arc(p.x - camX + p.w/2, p.y + p.h/2, 5, 0, Math.PI*2);
+      ctx.fill();
+      // Projectile core
+      ctx.fillStyle = '#ffa';
+      ctx.beginPath();
+      ctx.arc(p.x - camX + p.w/2, p.y + p.h/2, 2, 0, Math.PI*2);
       ctx.fill();
     }
     this.drawStunStars(ctx, camX);
@@ -505,68 +663,157 @@ class Birdo extends Enemy {
     ctx.beginPath();
     ctx.ellipse(sx+this.w/2, sy+this.h*0.6, this.w/2-2, this.h*0.4, 0, 0, Math.PI*2);
     ctx.fill();
+    // Body highlight
+    ctx.fillStyle = angry ? '#ff4080' : '#f06080';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-4, sy+this.h*0.55, this.w/4, this.h*0.25, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Body belly (lighter)
+    ctx.fillStyle = '#f9b0c0';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2, sy+this.h*0.65, this.w/3-2, this.h*0.22, 0, 0, Math.PI*2);
+    ctx.fill();
     // Head
     ctx.fillStyle = angry ? '#ff2060' : '#f05070';
     ctx.beginPath();
     ctx.ellipse(sx+this.w/2, sy+this.h*0.28, 18, 16, 0, 0, Math.PI*2);
     ctx.fill();
-    // Bow
+    // Head highlight
+    ctx.fillStyle = angry ? '#ff4080' : '#f87090';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-4, sy+this.h*0.22, 8, 8, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Bow - left loop
+    ctx.fillStyle = '#ff3060';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-6, sy+4, 5, 4, -0.3, 0, Math.PI*2);
+    ctx.fill();
+    // Bow - right loop
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2+6, sy+4, 5, 4, 0.3, 0, Math.PI*2);
+    ctx.fill();
+    // Bow - center
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(sx+this.w/2, sy+4, 8, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2, sy+4, 3, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#ffb0c0';
-    ctx.fillRect(sx+this.w/2-3, sy+1, 6, 6);
-    // Eyes
+    // Bow ribbon highlight
+    ctx.fillStyle = '#ff5080';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-6, sy+3, 2, 2, 0, 0, Math.PI*2);
+    ctx.ellipse(sx+this.w/2+6, sy+3, 2, 2, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Eyes (white with detail)
     ctx.fillStyle = '#fff';
-    ctx.fillRect(sx+this.w/2-12, sy+this.h*0.18, 8, 8);
-    ctx.fillRect(sx+this.w/2+4, sy+this.h*0.18, 8, 8);
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-8, sy+this.h*0.22, 5, 5, 0, 0, Math.PI*2);
+    ctx.ellipse(sx+this.w/2+8, sy+this.h*0.22, 5, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Pupils
     ctx.fillStyle = '#222';
-    ctx.fillRect(sx+this.w/2-10, sy+this.h*0.2, 4, 4);
-    ctx.fillRect(sx+this.w/2+6, sy+this.h*0.2, 4, 4);
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-7, sy+this.h*0.23, 3, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2+7, sy+this.h*0.23, 3, 0, Math.PI*2);
+    ctx.fill();
+    // Eye highlights
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-6, sy+this.h*0.20, 1.5, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2+8, sy+this.h*0.20, 1.5, 0, Math.PI*2);
+    ctx.fill();
+    // Eyelashes
+    ctx.fillStyle = '#222';
+    ctx.fillRect(sx+this.w/2-13, sy+this.h*0.16, 10, 1);
+    ctx.fillRect(sx+this.w/2+3, sy+this.h*0.16, 10, 1);
     // Snout
     ctx.fillStyle = '#f9d8b0';
     ctx.beginPath();
     ctx.ellipse(sx+this.w/2, sy+this.h*0.35, 14, 10, 0, 0, Math.PI*2);
     ctx.fill();
+    // Snout highlight
+    ctx.fillStyle = '#fde8c8';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-3, sy+this.h*0.32, 6, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Mouth opening (cannon-like)
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2+10, sy+this.h*0.35, 4, 5, 0, 0, Math.PI*2);
+    ctx.fill();
     // Nostrils
     ctx.fillStyle = '#e84060';
     ctx.beginPath();
-    ctx.arc(sx+this.w/2-5, sy+this.h*0.32, 3, 0, Math.PI*2);
-    ctx.arc(sx+this.w/2+5, sy+this.h*0.32, 3, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2-4, sy+this.h*0.32, 2, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2+4, sy+this.h*0.32, 2, 0, Math.PI*2);
     ctx.fill();
+    // Arms (small stubs)
+    ctx.fillStyle = angry ? '#ff1050' : '#e84060';
+    ctx.fillRect(sx-2, sy+this.h*0.45, 6, 12);
+    ctx.fillRect(sx+this.w-4, sy+this.h*0.45, 6, 12);
     // Feet
     ctx.fillStyle = '#c03050';
     ctx.fillRect(sx+4, sy+this.h-8, 14, 8);
     ctx.fillRect(sx+this.w-18, sy+this.h-8, 14, 8);
+    // Feet highlight
+    ctx.fillStyle = '#d04060';
+    ctx.fillRect(sx+5, sy+this.h-8, 8, 3);
+    ctx.fillRect(sx+this.w-17, sy+this.h-8, 8, 3);
+    // Toe claws
+    ctx.fillStyle = '#a02040';
+    ctx.fillRect(sx+3, sy+this.h-2, 3, 2);
+    ctx.fillRect(sx+12, sy+this.h-2, 3, 2);
+    ctx.fillRect(sx+this.w-19, sy+this.h-2, 3, 2);
+    ctx.fillRect(sx+this.w-10, sy+this.h-2, 3, 2);
 
     ctx.restore();
 
-    // HP bar
+    // HP bar background
     const bw = 60, bh = 7;
     const bx = this.x - camX + this.w/2 - bw/2;
     const by = this.y - 16;
     ctx.fillStyle = '#400';
     ctx.fillRect(bx, by, bw, bh);
-    ctx.fillStyle = '#f44';
-    ctx.fillRect(bx, by, bw * (this.hp / this.maxHp), bh);
+    // HP bar fill with gradient effect
+    const hpRatio = this.hp / this.maxHp;
+    ctx.fillStyle = hpRatio > 0.5 ? '#f44' : hpRatio > 0.25 ? '#f80' : '#f00';
+    ctx.fillRect(bx, by, bw * hpRatio, bh);
+    // HP bar shine
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(bx, by, bw * hpRatio, bh/2);
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1;
     ctx.strokeRect(bx, by, bw, bh);
     ctx.fillStyle = '#fff';
-    ctx.font = '8px Courier New';
+    ctx.font = 'bold 8px Courier New';
     ctx.textAlign = 'center';
     ctx.fillText('BIRDO', this.x - camX + this.w/2, by - 2);
 
-    // Draw eggs
+    // Draw eggs with more detail
     for (const egg of this.eggs) {
+      const ex = egg.x - camX + egg.w/2;
+      const ey = egg.y + egg.h/2;
+      // Egg shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(ex, ey+egg.h/2, egg.w/3, 3, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Egg body
       ctx.fillStyle = '#f9a0c0';
       ctx.beginPath();
-      ctx.ellipse(egg.x - camX + egg.w/2, egg.y + egg.h/2, egg.w/2, egg.h/2, 0, 0, Math.PI*2);
+      ctx.ellipse(ex, ey, egg.w/2, egg.h/2, 0, 0, Math.PI*2);
       ctx.fill();
+      // Egg highlight
+      ctx.fillStyle = '#ffc0d8';
+      ctx.beginPath();
+      ctx.ellipse(ex-3, ey-3, egg.w/4, egg.h/4, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Egg spots
       ctx.fillStyle = '#e84060';
       ctx.beginPath();
-      ctx.arc(egg.x - camX + egg.w/2, egg.y + egg.h/2, 3, 0, Math.PI*2);
+      ctx.arc(ex+2, ey+2, 3, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(ex-3, ey+1, 2, 0, Math.PI*2);
       ctx.fill();
     }
   }
@@ -684,29 +931,97 @@ class Wart extends Enemy {
     // Body
     ctx.fillStyle = angry ? '#3adf3a' : '#2a9e2a';
     ctx.fillRect(sx+4, sy+24, this.w-8, this.h-24);
+    // Body shading (sides darker)
+    ctx.fillStyle = angry ? '#2abf2a' : '#1a8a1a';
+    ctx.fillRect(sx+4, sy+24, 6, this.h-24);
+    ctx.fillRect(sx+this.w-10, sy+24, 6, this.h-24);
+    // Belly (lighter)
+    ctx.fillStyle = '#80d080';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2, sy+40, 16, 12, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Belly highlight
+    ctx.fillStyle = '#a0e0a0';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-2, sy+38, 8, 6, 0, 0, Math.PI*2);
+    ctx.fill();
     // Head
     ctx.fillStyle = angry ? '#3adf3a' : '#2abe2a';
     ctx.beginPath();
     ctx.ellipse(sx+this.w/2, sy+20, 28, 24, 0, 0, Math.PI*2);
     ctx.fill();
-    // Crown
+    // Head highlight
+    ctx.fillStyle = angry ? '#4aef4a' : '#3ace3a';
+    ctx.beginPath();
+    ctx.ellipse(sx+this.w/2-6, sy+14, 12, 10, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Crown base band
+    ctx.fillStyle = '#ffe04b';
+    ctx.fillRect(sx+4, sy-4, this.w-8, 6);
+    // Crown band highlight
+    ctx.fillStyle = '#fff8a0';
+    ctx.fillRect(sx+6, sy-3, this.w-12, 2);
+    // Crown spires
     ctx.fillStyle = '#ffe04b';
     for (let i = 0; i < 5; i++) {
       const cx2 = sx + 8 + i * 12;
       ctx.fillRect(cx2, sy-8, 8, 10);
       ctx.fillRect(cx2+2, sy-12, 4, 6);
     }
-    ctx.fillRect(sx+4, sy-4, this.w-8, 6);
+    // Crown jewels (red gems)
+    ctx.fillStyle = '#ff2020';
+    ctx.beginPath();
+    ctx.arc(sx+12, sy-9, 2.5, 0, Math.PI*2);
+    ctx.arc(sx+24, sy-9, 2.5, 0, Math.PI*2);
+    ctx.arc(sx+36, sy-9, 2.5, 0, Math.PI*2);
+    ctx.arc(sx+48, sy-9, 2.5, 0, Math.PI*2);
+    ctx.fill();
+    // Crown jewel highlights
+    ctx.fillStyle = '#ff8080';
+    ctx.beginPath();
+    ctx.arc(sx+11, sy-10, 1, 0, Math.PI*2);
+    ctx.arc(sx+23, sy-10, 1, 0, Math.PI*2);
+    ctx.arc(sx+35, sy-10, 1, 0, Math.PI*2);
+    ctx.arc(sx+47, sy-10, 1, 0, Math.PI*2);
+    ctx.fill();
     // Eyes
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.arc(sx+this.w/2-14, sy+10, 9, 0, Math.PI*2);
     ctx.arc(sx+this.w/2+14, sy+10, 9, 0, Math.PI*2);
     ctx.fill();
+    // Iris
     ctx.fillStyle = angry ? '#f44' : '#1a1a8a';
     ctx.beginPath();
     ctx.arc(sx+this.w/2-14, sy+10, 5, 0, Math.PI*2);
     ctx.arc(sx+this.w/2+14, sy+10, 5, 0, Math.PI*2);
+    ctx.fill();
+    // Pupil
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-14, sy+11, 2.5, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2+14, sy+11, 2.5, 0, Math.PI*2);
+    ctx.fill();
+    // Eye highlights
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(sx+this.w/2-16, sy+8, 2, 0, Math.PI*2);
+    ctx.arc(sx+this.w/2+12, sy+8, 2, 0, Math.PI*2);
+    ctx.fill();
+    // Eyebrows (angry = angled)
+    ctx.fillStyle = '#1a6a1a';
+    if (angry) {
+      ctx.fillRect(sx+this.w/2-22, sy+2, 16, 3);
+      ctx.fillRect(sx+this.w/2+6, sy+2, 16, 3);
+    } else {
+      ctx.fillRect(sx+this.w/2-22, sy+1, 16, 2);
+      ctx.fillRect(sx+this.w/2+6, sy+1, 16, 2);
+    }
+    // Cheeks (warts/bumps)
+    ctx.fillStyle = '#1a8a1a';
+    ctx.beginPath();
+    ctx.arc(sx+8, sy+22, 4, 0, Math.PI*2);
+    ctx.arc(sx+this.w-8, sy+22, 4, 0, Math.PI*2);
     ctx.fill();
     // Mouth
     ctx.fillStyle = '#1a4a1a';
@@ -714,13 +1029,26 @@ class Wart extends Enemy {
       ctx.beginPath();
       ctx.arc(sx+this.w/2, sy+28, 18, 0, Math.PI);
       ctx.fill();
+      // Tongue/mouth interior
       ctx.fillStyle = '#ff2020';
-      ctx.fillRect(sx+this.w/2-14, sy+28, 28, 4);
-      // Teeth
+      ctx.beginPath();
+      ctx.ellipse(sx+this.w/2, sy+32, 12, 6, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Teeth (upper)
       ctx.fillStyle = '#fff';
       for (let i = 0; i < 4; i++) {
         ctx.fillRect(sx+this.w/2-12+i*7, sy+22, 5, 6);
       }
+      // Teeth highlights
+      ctx.fillStyle = '#e8e8e8';
+      for (let i = 0; i < 4; i++) {
+        ctx.fillRect(sx+this.w/2-12+i*7, sy+26, 5, 2);
+      }
+      // Uvula hint
+      ctx.fillStyle = '#cc1010';
+      ctx.beginPath();
+      ctx.arc(sx+this.w/2, sy+36, 3, 0, Math.PI*2);
+      ctx.fill();
     } else {
       ctx.beginPath();
       ctx.moveTo(sx+this.w/2-14, sy+28);
@@ -728,15 +1056,42 @@ class Wart extends Enemy {
       ctx.strokeStyle = '#1a4a1a';
       ctx.lineWidth = 3;
       ctx.stroke();
+      // Lip line
+      ctx.fillStyle = '#1a6a1a';
+      ctx.fillRect(sx+this.w/2-12, sy+26, 24, 2);
     }
     // Arms
-    ctx.fillStyle = '#2a9e2a';
+    ctx.fillStyle = angry ? '#3adf3a' : '#2a9e2a';
     ctx.fillRect(sx-8, sy+26, 12, 20);
     ctx.fillRect(sx+this.w-4, sy+26, 12, 20);
+    // Arm shading
+    ctx.fillStyle = '#1a8a1a';
+    ctx.fillRect(sx-8, sy+26, 3, 20);
+    ctx.fillRect(sx+this.w+5, sy+26, 3, 20);
+    // Hands/claws
+    ctx.fillStyle = '#1a6a1a';
+    ctx.fillRect(sx-10, sy+42, 14, 6);
+    ctx.fillRect(sx+this.w-4, sy+42, 14, 6);
+    // Claw fingers
+    ctx.fillStyle = '#0a4a0a';
+    ctx.fillRect(sx-10, sy+46, 4, 3);
+    ctx.fillRect(sx-4, sy+46, 4, 3);
+    ctx.fillRect(sx+this.w-2, sy+46, 4, 3);
+    ctx.fillRect(sx+this.w+4, sy+46, 4, 3);
     // Feet
     ctx.fillStyle = '#1a6a1a';
-    ctx.fillRect(sx+6, sy+this.h-8, 18, 8);
-    ctx.fillRect(sx+this.w-24, sy+this.h-8, 18, 8);
+    ctx.fillRect(sx+4, sy+this.h-8, 18, 8);
+    ctx.fillRect(sx+this.w-22, sy+this.h-8, 18, 8);
+    // Feet highlight
+    ctx.fillStyle = '#2a8a2a';
+    ctx.fillRect(sx+5, sy+this.h-8, 12, 3);
+    ctx.fillRect(sx+this.w-21, sy+this.h-8, 12, 3);
+    // Toe claws
+    ctx.fillStyle = '#0a4a0a';
+    ctx.fillRect(sx+3, sy+this.h-2, 4, 2);
+    ctx.fillRect(sx+14, sy+this.h-2, 4, 2);
+    ctx.fillRect(sx+this.w-23, sy+this.h-2, 4, 2);
+    ctx.fillRect(sx+this.w-12, sy+this.h-2, 4, 2);
 
     ctx.restore();
 
@@ -746,8 +1101,12 @@ class Wart extends Enemy {
     const by = this.y - 20;
     ctx.fillStyle = '#300';
     ctx.fillRect(bx, by, bw, bh);
-    ctx.fillStyle = '#0f0';
-    ctx.fillRect(bx, by, bw * (this.hp / this.maxHp), bh);
+    const hpRatio = this.hp / this.maxHp;
+    ctx.fillStyle = hpRatio > 0.5 ? '#0f0' : hpRatio > 0.25 ? '#ff0' : '#f00';
+    ctx.fillRect(bx, by, bw * hpRatio, bh);
+    // HP bar shine
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.fillRect(bx, by, bw * hpRatio, bh/2);
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1;
     ctx.strokeRect(bx, by, bw, bh);
@@ -760,18 +1119,32 @@ class Wart extends Enemy {
     if (!this.mouthOpen && this.mouthTimer % 90 < 60) {
       ctx.fillStyle = 'rgba(255,255,0,0.6)';
       ctx.font = '8px Courier New';
-      ctx.fillText('↑ THROW VEGGIES!', this.x - camX + this.w/2, by - 12);
+      ctx.fillText('THROW VEGGIES!', this.x - camX + this.w/2, by - 12);
     }
 
-    // Bubbles
+    // Bubbles with more detail
     for (const b of this.bubbles) {
-      ctx.fillStyle = 'rgba(80, 180, 255, 0.7)';
+      const bCx = b.x - camX + b.w/2;
+      const bCy = b.y + b.h/2;
+      // Bubble glow
+      ctx.fillStyle = 'rgba(80, 180, 255, 0.3)';
       ctx.beginPath();
-      ctx.arc(b.x - camX + b.w/2, b.y + b.h/2, b.w/2, 0, Math.PI*2);
+      ctx.arc(bCx, bCy, b.w/2+2, 0, Math.PI*2);
       ctx.fill();
+      // Bubble body
+      ctx.fillStyle = 'rgba(80, 180, 255, 0.6)';
+      ctx.beginPath();
+      ctx.arc(bCx, bCy, b.w/2, 0, Math.PI*2);
+      ctx.fill();
+      // Bubble outline
       ctx.strokeStyle = 'rgba(180,220,255,0.9)';
       ctx.lineWidth = 1.5;
       ctx.stroke();
+      // Bubble highlight
+      ctx.fillStyle = 'rgba(220,240,255,0.7)';
+      ctx.beginPath();
+      ctx.arc(bCx-2, bCy-3, b.w/5, 0, Math.PI*2);
+      ctx.fill();
     }
   }
 }
