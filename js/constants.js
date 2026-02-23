@@ -3,7 +3,7 @@ const TILE = 32;          // tile size in pixels
 const GRAVITY = 0.55;
 const TERMINAL_VEL = 14;
 const CANVAS_W = 800;
-const CANVAS_H = 480;
+const CANVAS_H = 800;  // Match full level height (25 tiles * 32px) so the player spawns on-screen
 
 // Character definitions
 const CHARACTERS = {
