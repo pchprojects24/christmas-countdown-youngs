@@ -1,6 +1,13 @@
 /* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
 body {
   background: #000;
   color: #fff;
@@ -9,18 +16,28 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }
 
 /* ===== GAME CONTAINER ===== */
 #game-container {
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
 }
 
 /* ===== SCREENS ===== */
@@ -163,8 +180,10 @@ body {
 #game-canvas {
   display: block;
   image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
   max-width: 100%;
   max-height: calc(100vh - 80px);
+  max-height: calc(100dvh - 80px);
   flex: 1;
 }
 
@@ -174,7 +193,9 @@ body {
   width: 100%;
   max-width: 800px;
   justify-content: space-between;
-  padding: 8px 16px;
+  align-items: center;
+  padding: 10px 20px;
+  padding-bottom: max(10px, var(--sab));
   background: #111;
   border-top: 2px solid #333;
 }
@@ -182,32 +203,41 @@ body {
   #mobile-controls { display: flex; }
 }
 
-#dpad { display: flex; gap: 8px; }
-#action-btns { display: flex; gap: 8px; }
+#dpad { display: flex; gap: 10px; }
+#action-btns { display: flex; gap: 12px; }
 
 .dpad-btn, .action-btn {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   background: rgba(255,255,255,0.15);
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 10px;
   color: #fff;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   touch-action: none;
+  -webkit-touch-callout: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: inherit;
 }
 .action-btn {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: rgba(255,100,50,0.3);
+  background: rgba(255,100,50,0.35);
   font-weight: bold;
+  font-size: 22px;
+  border: 3px solid rgba(255,130,60,0.5);
+}
+.action-btn#btn-jump {
+  background: rgba(80,160,255,0.35);
+  border-color: rgba(100,180,255,0.5);
 }
 .dpad-btn:active, .action-btn:active {
-  background: rgba(255,255,255,0.35);
-  transform: scale(0.94);
+  background: rgba(255,255,255,0.4);
+  transform: scale(0.92);
 }
 
 /* ===== OVERLAY SCREENS ===== */

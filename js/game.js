@@ -24,6 +24,7 @@ class Game {
     this.lastTime = 0;
 
     this._setupCanvas();
+    this._preventIOSBounce();
     this._setupInput();
     this._setupUI();
     this._renderCharPreviews();
@@ -35,7 +36,11 @@ class Game {
   _setupCanvas() {
     this.canvas.width  = CANVAS_W;
     this.canvas.height = CANVAS_H;
-    window.addEventListener('resize', () => this._resizeCanvas());
+    this._resizeTimeout = null;
+    window.addEventListener('resize', () => {
+      if (this._resizeTimeout) clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = setTimeout(() => this._resizeCanvas(), 60);
+    });
     this._resizeCanvas();
   }
 
@@ -46,11 +51,19 @@ class Game {
     const hud = document.getElementById('hud');
     const mob = document.getElementById('mobile-controls');
     const hudH = hud ? hud.offsetHeight : 0;
-    const mobH = (mob && getComputedStyle(mob).display !== 'none') ? mob.offsetHeight : 0;
-    const avH  = ch - hudH - mobH;
+    const mobH = (mob && mob.offsetHeight > 0 && mob.style.display !== 'none') ? mob.offsetHeight : 0;
+    const safeBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab') || '0');
+    const avH  = ch - hudH - mobH - safeBottom;
     const scale = Math.min(cw / CANVAS_W, avH / CANVAS_H);
     this.canvas.style.width  = Math.floor(CANVAS_W * scale) + 'px';
     this.canvas.style.height = Math.floor(CANVAS_H * scale) + 'px';
+  }
+
+  _preventIOSBounce() {
+    document.addEventListener('touchmove', e => {
+      if (this.state === STATE.PLAYING) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('gesturestart', e => e.preventDefault());
   }
 
   _setupInput() {
@@ -102,6 +115,10 @@ class Game {
       });
       btn.addEventListener('pointerup', e => {
         e.preventDefault();
+        KEYS[action] = false;
+        delete KEYS_DOWN[action];
+      });
+      btn.addEventListener('pointercancel', e => {
         KEYS[action] = false;
         delete KEYS_DOWN[action];
       });
@@ -255,7 +272,7 @@ class Game {
 
   // ===== GAME EVENTS =====
   onPlayerDeath() {
-    setTimeout(() => {}, 0);
+    // Death handled by player.startDeath -> respawnOrGameOver
   }
 
   respawnOrGameOver() {
@@ -379,7 +396,8 @@ class Game {
 
   // ===== MAIN LOOP =====
   _loop(timestamp) {
-    const dt = Math.min((timestamp - this.lastTime) / 16.67, 3);
+    const elapsed = timestamp - this.lastTime;
+    const dt = this.lastTime === 0 ? 1 : Math.min(elapsed / 16.67, 3);
     this.lastTime = timestamp;
 
     if (this.state === STATE.PLAYING) {
@@ -410,17 +428,7 @@ class Game {
 
     // Enemies
     for (const e of this.enemies) {
-      if (e instanceof Birdo) {
-        e.update(this.level, this.player, this);
-      } else if (e instanceof Wart) {
-        e.update(this.level, this.player, this);
-      } else if (e instanceof Snifit) {
-        e.update(this.level, this.player, this);
-      } else if (e instanceof Ninji) {
-        e.update(this.level, this.player, this);
-      } else {
-        e.update(this.level, this.player, this);
-      }
+      e.update(this.level, this.player, this);
     }
     this.enemies = this.enemies.filter(e => !e.dead);
 
@@ -503,17 +511,15 @@ class Game {
     ctx.fillText('CONTROLS:', 12, 22);
     ctx.fillStyle = '#fff';
     ctx.fillText('← → : Move', 12, 36);
-    ctx.fillText('Z/X/B : Jump', 12, 48);
-    ctx.fillText('Shift/Z : Run / Pickup / Throw', 12, 60);
-    ctx.fillText('B key or Shift = pick up & throw', 12, 72);
+    ctx.fillText('Space/X : Jump', 12, 48);
+    ctx.fillText('Shift/Z/B : Run / Pickup / Throw', 12, 60);
+    ctx.fillText('↓ : Crouch', 12, 72);
     ctx.restore();
   }
 
   // ===== SELECT SCREEN ANIMATION =====
   _drawSelectAnim(timestamp) {
-    // Animated background on select screen
-    const canvas = document.createElement('canvas');
-    // Just use CSS animation on select screen
+    // Select screen uses CSS animations - no canvas work needed
   }
 }
 
