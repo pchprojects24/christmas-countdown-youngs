@@ -1,374 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="The Youngs family Christmas countdown hub with schedule, weather updates, and contact information for the holiday season." />
-  <meta name="theme-color" content="#050a06" />
-
-  <!-- Open Graph / Social Media -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="The Youngs' Christmas Hub" />
-  <meta property="og:description" content="Family Christmas countdown and holiday planning hub" />
-
-  <title>The Youngs' Christmas Countdown</title>
-
-  <!-- Preconnect to external API -->
-  <link rel="preconnect" href="https://api.open-meteo.com" />
-  <style>
-    :root {
-      --bg: #050a06; 
-      --card: rgba(255, 255, 255, 0.08);
-      --text: #ffffff;
-      --accent: #d4af37; 
-      --holiday-red: #991b1b;
-      --border: rgba(255, 255, 255, 0.15);
-    }
-    
-    * { box-sizing: border-box; }
-    
-    body {
-      margin: 0;
-      font-family: 'Georgia', serif;
-      background: radial-gradient(circle at top, #142b1a, var(--bg));
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-    .snowflake { position: absolute; top: -10px; color: white; opacity: 0.8; animation: fall linear infinite; }
-    @keyframes fall { to { transform: translateY(105vh); } }
-
-    .wrap { max-width: 650px; margin: 0 auto; padding: 20px 15px; position: relative; z-index: 1; }
-
-    /* Header */
-    .site-header { text-align: center; margin-bottom: 20px; }
-    .header-top { display: block; font-size: 18px; color: var(--accent); text-transform: uppercase; letter-spacing: 4px; font-weight: 700; opacity: 0.9; }
-    .header-bottom { display: block; font-size: 34px; font-weight: 800; color: var(--accent); text-shadow: 0 0 15px var(--accent); margin: 5px 0 0 0; }
-
-    /* Featured Event Card */
-    .featured-card {
-      background: linear-gradient(145deg, var(--holiday-red), #600);
-      border: 2px solid var(--accent);
-      border-radius: 20px;
-      padding: 20px 15px;
-      text-align: center;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
-    .featured-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: bold; }
-    .featured-title { font-size: 22px; font-weight: 800; margin: 8px 0; }
-    .featured-timer { font-size: 32px; font-weight: 900; font-family: monospace; }
-
-    /* Contact Hub */
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-    .contact-card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 12px; text-align: center; }
-    .contact-name { font-size: 12px; font-weight: bold; color: var(--accent); margin-bottom: 8px; }
-    .contact-btns { display: flex; flex-direction: column; gap: 5px; }
-    .c-btn { 
-      font-size: 10px; text-decoration: none; color: white; border: 1px solid var(--border); 
-      padding: 6px; border-radius: 5px; background: rgba(255,255,255,0.05);
-      min-height: 44px; display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Cards */
-    .card { 
-      background: var(--card); 
-      border: 1px solid var(--border); 
-      border-radius: 15px; 
-      padding: 18px; 
-      margin-bottom: 15px; 
-      backdrop-filter: blur(12px); 
-    }
-    .label { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin: 0 0 12px 0; }
-    
-    .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-    .weather-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
-    .w-loc { font-size: 12px; font-weight: bold; color: var(--accent); margin-bottom: 4px; }
-    .w-temp { font-size: 24px; font-weight: 800; }
-
-    /* Itinerary List */
-    .event { padding: 15px 10px; border-bottom: 1px solid var(--border); }
-    .event-main { display: flex; justify-content: space-between; align-items: flex-start; }
-    .event-name { font-weight: bold; margin: 0; font-size: 16px; color: #fff; }
-    .event-time { font-size: 12px; color: #aaa; margin-top: 4px; font-style: italic; }
-    
-    .notes-toggle {
-      background: none; border: 1px solid var(--accent); color: var(--accent);
-      font-size: 10px; padding: 4px 8px; border-radius: 4px; margin-top: 8px;
-      cursor: pointer; text-transform: uppercase; font-weight: bold;
-    }
-    
-    .details { max-height: 0; overflow: hidden; transition: 0.3s ease; font-size: 14px; color: #ddd; }
-    .event.open .details { max-height: 400px; padding: 12px 0; }
-    
-    .sub-itinerary { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--accent); padding-left: 15px; }
-    .sub-itinerary li { margin-bottom: 8px; position: relative; }
-
-    .hub-btn { 
-      display: inline-block; margin-top: 10px; background: var(--accent); color: black; 
-      padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: bold;
-    }
-
-    .footer-line { text-align: center; font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 30px; padding-bottom: 20px; }
-
-    .btn { background: var(--holiday-red); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; display: block; text-align: center; }
-    .btn-gold { background: var(--accent); color: black; text-decoration: none; }
-
-    @media (max-width: 600px) {
-      .header-bottom { font-size: 30px; }
-      .featured-timer { font-size: 28px; }
-    }
-    
-    /* Mobile Responsiveness for Contact Grid */
-    @media (max-width: 400px) {
-      .contact-grid { grid-template-columns: 1fr; gap: 12px; }
-      .c-btn { font-size: 12px; padding: 8px; }
-    }
-    
-    @media (min-width: 401px) and (max-width: 600px) {
-      .contact-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Super Mario Bros 2 Clone</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<div class="snow-container" id="snow"></div>
-
-<div class="wrap">
-  <header class="site-header" role="banner">
-    <span class="header-top">The Youngs'</span>
-    <h1 class="header-bottom">🎄 Christmas Hub 🎄</h1>
-  </header>
-
-  <section class="featured-card" id="featuredSection" aria-labelledby="featured-label">
-    <div class="featured-label" id="featured-label">Next Up</div>
-    <div class="featured-title" id="featuredTitle" role="status" aria-live="polite">Checking Schedule...</div>
-    <div class="featured-timer" id="featuredTimer" role="timer" aria-live="polite">00:00:00:00</div>
-  </section>
-
-  <section class="card" aria-labelledby="contact-label">
-    <h2 class="label" id="contact-label">Contact the Crew</h2>
-    <div class="contact-grid">
-      <div class="contact-card">
-        <div class="contact-name">Chad</div>
-        <div class="contact-btns">
-          <a href="tel:+19024028879" class="c-btn">📞 Call</a>
-          <a href="sms:+19024028879" class="c-btn">💬 SMS</a>
-        </div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-name">Mona</div>
-        <div class="contact-btns">
-          <a href="tel:+15066074410" class="c-btn">📞 Call</a>
-          <a href="sms:+15066074410" class="c-btn">💬 SMS</a>
-        </div>
-      </div>
-      <div class="contact-card">
-        <div class="contact-name">Marice</div>
-        <div class="contact-btns">
-          <a href="tel:+19022217108" class="c-btn">📞 Call</a>
-          <a href="sms:+19022217108" class="c-btn">💬 SMS</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" aria-labelledby="weather-label">
-    <h2 class="label" id="weather-label">Weather & Travel</h2>
-    <div class="weather-grid">
-      <div class="weather-item">
-        <div class="w-loc">Timberlea</div>
-        <div class="w-temp" id="t-temp" role="status" aria-live="polite" aria-label="Timberlea temperature">--°C</div>
-      </div>
-      <div class="weather-item">
-        <div class="w-loc">C. Narrows</div>
-        <div class="w-temp" id="c-temp" role="status" aria-live="polite" aria-label="Cambridge Narrows temperature">--°C</div>
-      </div>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <a href="https://511.novascotia.ca/" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:var(--accent); border:1px solid var(--accent); padding:10px; border-radius:10px; font-size:11px; text-align:center;" aria-label="Nova Scotia road conditions">⚠️ NS Roads</a>
-      <a href="https://511.gnb.ca/" target="_blank" rel="noopener noreferrer" style="text-decoration:none; color:var(--accent); border:1px solid var(--accent); padding:10px; border-radius:10px; font-size:11px; text-align:center;" aria-label="New Brunswick road conditions">⚠️ NB Roads</a>
-    </div>
-  </section>
-
-  <section class="card" aria-labelledby="schedule-label">
-    <h2 class="label" id="schedule-label">Holiday Schedule</h2>
-    <div id="eventList" role="list"></div>
-    <button class="btn" style="background: transparent; border: 1px solid var(--border); font-size: 12px; margin-top:15px;" id="toggleBtn" aria-expanded="false">Show Full List</button>
-  </section>
-
-  <a href="memories.html" class="btn btn-gold" style="font-size: 18px;">🎁 Christmas Memories</a>
-
-  <footer class="footer-line" id="lastUpdated" role="contentinfo">Last updated: Loading...</footer>
-</div>
-
-<script>
-  // Updated Data: Pick up Mona is now its own dated event
-  // NOTE: All ISO dates use Atlantic Standard Time (AST, UTC-04:00) timezone
-  // This is the timezone used in Nova Scotia and New Brunswick during winter months
-  const EVENTS = [
-    { 
-      name: "Chad departs Timberlea", 
-      iso: "2025-12-22T07:00:00-04:00", 
-      notes: ["Check road conditions before heading out."] 
-    },
-    { 
-      name: "Pick up Mona (Saint John)", 
-      iso: "2025-12-22T12:30:00-04:00", 
-      notes: ["Costco Shopping", "Pick up supper", "Arrive at Cambridge Narrows"] 
-    },
-    { 
-      name: "Leave Cambridge Narrows", 
-      iso: "2025-12-23T10:00:00-04:00", 
-      notes: ["Stop in Truro for Deluxe French Fries (Supper)"] 
-    },
-    { 
-      name: "Halifax Forum Bingo", 
-      iso: "2025-12-23T19:30:00-04:00", 
-      hubLink: "bingo.html",
-      notes: ["Doors: 5:00 PM", "Warm-up: 6:15 PM", "Main: 7:30 PM"] 
-    },
-    { 
-      name: "Wizard of Oz Show", 
-      iso: "2025-12-24T14:00:00-04:00", 
-      hubLink: "neptune.html",
-      notes: ["Neptune Theatre Main Stage", "Holiday Light Tour afterward"] 
-    },
-    { name: "Christmas Day", iso: "2025-12-25T10:00:00-04:00", notes: ["Family Dinner at home."] },
-    { name: "Boxing Day", iso: null, notes: ["To be determined."] },
-    { name: "Return Trip to NB", iso: "2025-12-27T09:00:00-04:00", notes: ["Marice and Mom depart for New Brunswick."] }
-  ];
-
-  let showAll = false;
-
-  async function fetchWeather(lat, lon, tempId) {
-    const tempElement = document.getElementById(tempId);
-    try {
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      if (data.current_weather && typeof data.current_weather.temperature === 'number') {
-        tempElement.textContent = Math.round(data.current_weather.temperature) + "°C";
-      } else {
-        throw new Error('Invalid weather data format');
-      }
-    } catch (e) {
-      console.error('Weather fetch error:', e);
-      tempElement.textContent = "N/A";
-      tempElement.title = "Weather data unavailable";
-    }
-  }
-
-  function renderEvents() {
-    const list = document.getElementById('eventList');
-    list.innerHTML = '';
-    const now = new Date();
-
-    // Deterministic expand/collapse: show first 3 if collapsed
-    const visibleEvents = showAll ? EVENTS : EVENTS.slice(0, 3);
-
-    visibleEvents.forEach((ev, i) => {
-      const row = document.createElement('div');
-      row.className = 'event';
-      row.setAttribute('role', 'listitem');
-      const date = ev.iso ? new Date(ev.iso) : null;
-
-      const timeStr = date
-        ? date.toLocaleDateString([], {month:'short', day:'numeric'}) + " @ " + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-        : "TBD";
-
-      let notesHtml = `<ul class="sub-itinerary">`;
-      ev.notes.forEach(n => { notesHtml += `<li>${n}</li>`; });
-      if (ev.hubLink) notesHtml += `<a href="${ev.hubLink}" class="hub-btn">Enter Hub ➔</a>`;
-      notesHtml += `</ul>`;
-
-      row.innerHTML = `
-        <div class="event-main">
-          <div>
-            <p class="event-name">${ev.name}</p>
-            <p class="event-time">${timeStr}</p>
-            <button class="notes-toggle" onclick="toggleNotes(this)" aria-label="Toggle notes for ${ev.name}">Notes</button>
+  <div id="game-container">
+    <!-- Character Select Screen -->
+    <div id="screen-select" class="screen active">
+      <h1 class="title-text">SUPER MARIO BROS. 2</h1>
+      <p class="subtitle">SELECT YOUR CHARACTER</p>
+      <div id="character-grid">
+        <div class="char-card" data-char="mario">
+          <canvas class="char-preview" width="64" height="64" data-char="mario"></canvas>
+          <div class="char-name">MARIO</div>
+          <div class="char-stats">
+            <span>Speed: ★★★☆</span>
+            <span>Jump: ★★★☆</span>
+            <span>Lift: ★★★☆</span>
           </div>
+          <div class="char-desc">All-around hero. Great balance of speed and jumping ability.</div>
         </div>
-        <div class="details">${notesHtml}</div>
-      `;
-      list.appendChild(row);
-    });
-  }
+        <div class="char-card" data-char="luigi">
+          <canvas class="char-preview" width="64" height="64" data-char="luigi"></canvas>
+          <div class="char-name">LUIGI</div>
+          <div class="char-stats">
+            <span>Speed: ★★☆☆</span>
+            <span>Jump: ★★★★</span>
+            <span>Lift: ★★★☆</span>
+          </div>
+          <div class="char-desc">Floaty jump and long air-time. Great for tricky platforms.</div>
+        </div>
+        <div class="char-card" data-char="toad">
+          <canvas class="char-preview" width="64" height="64" data-char="toad"></canvas>
+          <div class="char-name">TOAD</div>
+          <div class="char-stats">
+            <span>Speed: ★★★★</span>
+            <span>Jump: ★★☆☆</span>
+            <span>Lift: ★★★★</span>
+          </div>
+          <div class="char-desc">Fastest runner, strongest lifter. Short jump height.</div>
+        </div>
+        <div class="char-card" data-char="peach">
+          <canvas class="char-preview" width="64" height="64" data-char="peach"></canvas>
+          <div class="char-name">PEACH</div>
+          <div class="char-stats">
+            <span>Speed: ★★☆☆</span>
+            <span>Jump: ★★★☆</span>
+            <span>Lift: ★★☆☆</span>
+          </div>
+          <div class="char-desc">Float ability! Hold jump to glide through the air.</div>
+        </div>
+      </div>
+      <p class="hint-text">Click a character or press 1-4 to select</p>
+    </div>
 
-  function toggleNotes(btn) {
-    const eventDiv = btn.closest('.event');
-    const isOpen = eventDiv.classList.contains('open');
-    eventDiv.classList.toggle('open');
-    btn.textContent = eventDiv.classList.contains('open') ? "Close" : "Notes";
-    btn.setAttribute('aria-expanded', !isOpen);
-  }
+    <!-- Game Screen -->
+    <div id="screen-game" class="screen">
+      <div id="hud">
+        <div class="hud-item"><span class="hud-label">PLAYER</span><span id="hud-player">MARIO</span></div>
+        <div class="hud-item"><span class="hud-label">SCORE</span><span id="hud-score">000000</span></div>
+        <div class="hud-item"><span class="hud-label">WORLD</span><span id="hud-world">1-1</span></div>
+        <div class="hud-item"><span class="hud-label">LIVES</span><span id="hud-lives">♥♥♥</span></div>
+        <div class="hud-item"><span class="hud-label">HP</span><span id="hud-hp">●●●</span></div>
+      </div>
+      <canvas id="game-canvas"></canvas>
+      <div id="mobile-controls">
+        <div id="dpad">
+          <button class="dpad-btn" id="btn-left">◀</button>
+          <button class="dpad-btn" id="btn-right">▶</button>
+        </div>
+        <div id="action-btns">
+          <button class="action-btn" id="btn-run">B</button>
+          <button class="action-btn" id="btn-jump">A</button>
+        </div>
+      </div>
+    </div>
 
-  function updateMainTimer() {
-    const now = new Date();
-    // Logic fix: Find nearest future event with a valid date
-    const futureTimedEvents = EVENTS
-      .filter(ev => ev.iso && new Date(ev.iso) > now)
-      .sort((a, b) => new Date(a.iso) - new Date(b.iso));
+    <!-- Game Over Screen -->
+    <div id="screen-gameover" class="screen">
+      <h2 class="go-title">GAME OVER</h2>
+      <p id="go-score-text"></p>
+      <button class="menu-btn" id="btn-retry">PLAY AGAIN</button>
+      <button class="menu-btn" id="btn-select">CHARACTER SELECT</button>
+    </div>
 
-    const titleElement = document.getElementById('featuredTitle');
-    const timerElement = document.getElementById('featuredTimer');
+    <!-- Win Screen -->
+    <div id="screen-win" class="screen">
+      <h2 class="win-title">YOU WIN!</h2>
+      <p id="win-score-text"></p>
+      <p class="win-sub">WART has been defeated!</p>
+      <button class="menu-btn" id="btn-play-again">PLAY AGAIN</button>
+      <button class="menu-btn" id="btn-select-win">CHARACTER SELECT</button>
+    </div>
 
-    if (futureTimedEvents.length > 0) {
-      const next = futureTimedEvents[0];
-      titleElement.textContent = next.name;
-      const diff = new Date(next.iso) - now;
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      timerElement.textContent = `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
-    } else {
-      titleElement.textContent = "Merry Christmas!";
-      timerElement.textContent = "Family Time!";
-    }
-  }
+    <!-- Pause Screen -->
+    <div id="screen-pause" class="screen">
+      <h2 class="pause-title">PAUSED</h2>
+      <button class="menu-btn" id="btn-resume">RESUME</button>
+      <button class="menu-btn" id="btn-quit">QUIT TO SELECT</button>
+    </div>
+  </div>
 
-  function createSnow() {
-    const container = document.getElementById('snow');
-    for (let i = 0; i < 40; i++) {
-      let flake = document.createElement('div');
-      flake.className = 'snowflake';
-      flake.textContent = '❄';
-      flake.style.left = Math.random() * 100 + 'vw';
-      flake.style.animationDuration = (Math.random() * 5 + 7) + 's';
-      container.appendChild(flake);
-    }
-  }
-
-  document.getElementById('toggleBtn').onclick = () => {
-    showAll = !showAll;
-    renderEvents();
-    const toggleBtn = document.getElementById('toggleBtn');
-    toggleBtn.textContent = showAll ? "Show Less" : "Show Full List";
-    toggleBtn.setAttribute('aria-expanded', showAll);
-  };
-
-  // Set dynamic footer date
-  function updateFooterDate() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const footerElement = document.getElementById('lastUpdated');
-    footerElement.textContent = `Last updated: ${dateStr}`;
-  }
-
-  // Initialize application
-  createSnow();
-  renderEvents();
-  fetchWeather(44.65, -63.68, 't-temp'); // Timberlea, NS
-  fetchWeather(45.83, -66.07, 'c-temp'); // Cambridge Narrows, NB
-  setInterval(updateMainTimer, 1000);
-  updateMainTimer();
-  updateFooterDate();
-</script>
+  <script src="js/constants.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/enemies.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/game.js"></script>
 </body>
 </html>
