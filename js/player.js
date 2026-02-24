@@ -242,18 +242,25 @@ class Player extends Entity {
     // --- Jump hold (sustained lift) with improved curve ---
     if (jump && this.isJumping && this.vy < 0) {
       this.jumpHeld++;
-      if (this.jumpHeld < 18) {
+      if (this.jumpHeld < 20) {  // Increased from 18 for more control
         // Stronger at start, fading out for natural feel
-        const holdStrength = 1.0 - (this.jumpHeld / 18);
-        this.vy -= 0.35 * this.cfg.jumpHold * holdStrength;
+        const holdStrength = 1.0 - (this.jumpHeld / 20);
+        this.vy -= 0.38 * this.cfg.jumpHold * holdStrength;  // Slightly increased
       }
     }
+
+    // --- Jump cut: Release jump button early for shorter jumps ---
+    if (!jump && this.isJumping && this.vy < 0) {
+      this.vy *= JUMP_CUT_MULT;  // Cut upward velocity for responsive control
+      this.isJumping = false;
+    }
+
     if (!jump) { this.isJumping = false; }
 
     // --- Apex hang (reduced gravity near jump peak) ---
     const atApex = !this.onGround && Math.abs(this.vy) < APEX_THRESHOLD && !this.floating;
 
-    // Peach float
+    // Peach float (Olive's special ability)
     if (this.cfg.floatAbility && jump && !this.onGround && this.vy > 0) {
       if (!this.floating && KEYS_DOWN['jump']) {
         this.floating = true;
@@ -261,7 +268,7 @@ class Player extends Entity {
       }
       if (this.floating) {
         this.floatTimer++;
-        this.vy = Math.min(this.vy, 0.8);
+        this.vy = Math.min(this.vy, 1.0);  // Increased from 0.8 for slightly faster descent
         if (this.floatTimer >= this.cfg.floatDuration) {
           this.floating = false;
         }
