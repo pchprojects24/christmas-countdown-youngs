@@ -351,6 +351,10 @@ class Game {
     const py = Math.floor(this.player.bottom / TILE);
     const tile = this.level.getTile(px, py);
     const tileAbove = this.level.getTile(px, py - 1);
+
+    // The backyard boss level transitions via boss defeat, not the door tile
+    if (this.currentLevel === 2) return;
+
     if (tile === T.DOOR || tileAbove === T.DOOR) {
       // Is it the final boss level?
       if (this.currentLevel === LEVEL_BUILDERS.length - 1) return; // handled by boss defeat
