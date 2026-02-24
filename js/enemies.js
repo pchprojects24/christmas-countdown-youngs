@@ -54,7 +54,7 @@ class Enemy extends Entity {
       const tY = Math.floor(belowY / TILE);
       if (tY >= 0 && tY < level.height) {
         const tile = level.getTile(tX, tY);
-        if (!SOLID_TILES.has(tile)) this.patrolDir *= -1;
+        if (!SOLID_TILES.has(tile) && !ONE_WAY_TILES.has(tile)) this.patrolDir *= -1;
       }
     }
 

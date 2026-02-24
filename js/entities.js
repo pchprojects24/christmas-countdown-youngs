@@ -38,21 +38,34 @@ class Entity {
     this.x += this.vx;
     const hCols = level.getTileCollisions(this);
     for (const col of hCols) {
+      if (ONE_WAY_TILES.has(col.tile)) continue; // pass through horizontally
       if (this.vx > 0) { this.x = col.tileX * TILE - this.w; this.vx = 0; }
       else if (this.vx < 0) { this.x = (col.tileX + 1) * TILE; this.vx = 0; }
     }
 
-    // Vertical
+    // Vertical - track previous bottom for one-way platform check
+    const prevBottom = this.y + this.h;
     this.y += this.vy;
     const vCols = level.getTileCollisions(this);
     for (const col of vCols) {
       if (this.vy > 0) {
-        this.y = col.tileY * TILE - this.h;
-        this.vy = 0;
-        this.onGround = true;
+        if (ONE_WAY_TILES.has(col.tile)) {
+          // One-way: only land if entity was above the platform top last frame
+          if (prevBottom <= col.tileY * TILE + 4) { // 4px tolerance: must have been above platform
+            this.y = col.tileY * TILE - this.h;
+            this.vy = 0;
+            this.onGround = true;
+          }
+        } else {
+          this.y = col.tileY * TILE - this.h;
+          this.vy = 0;
+          this.onGround = true;
+        }
       } else if (this.vy < 0) {
-        this.y = (col.tileY + 1) * TILE;
-        this.vy = 0;
+        if (!ONE_WAY_TILES.has(col.tile)) { // pass through one-way from below
+          this.y = (col.tileY + 1) * TILE;
+          this.vy = 0;
+        }
       }
     }
   }
@@ -136,11 +149,17 @@ class Vegetable extends Entity {
     const c = this.colors;
 
     if (this.inGround) {
-      // Show item peeking out of treat bowl
+      // Show item peeking out of treat bowl with a glowing indicator
       const pullOff = this.pullProgress * this.h * 0.6;
+      const pulse = Math.sin(this.age * 0.1) * 2; // slow pulse for grab indicator
+      // Glow ring to make it obvious it can be picked up
+      ctx.fillStyle = 'rgba(255, 220, 80, 0.35)';
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2, sy - 2 + pullOff, 10 + pulse, 0, Math.PI*2);
+      ctx.fill();
       ctx.fillStyle = c.body;
       ctx.beginPath();
-      ctx.arc(sx + this.w/2, sy - 2 + pullOff, 6, 0, Math.PI*2);
+      ctx.arc(sx + this.w/2, sy - 2 + pullOff, 7, 0, Math.PI*2);
       ctx.fill();
       // Sparkle hint
       ctx.fillStyle = c.spot;
