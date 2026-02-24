@@ -87,7 +87,7 @@ class Game {
       if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') this._togglePause();
       // Number keys for char select
       if (this.state === STATE.SELECT) {
-        const chars = ['mario','luigi','toad','peach'];
+        const chars = ['marice','beatrice','alice','olive'];
         const idx = parseInt(e.key) - 1;
         if (idx >= 0 && idx < 4) this._startGame(chars[idx]);
       }
@@ -300,13 +300,13 @@ class Game {
     } else {
       this.state = STATE.GAMEOVER;
       this.totalScore += this.player.score;
-      document.getElementById('go-score-text').textContent = 'SCORE: ' + String(this.totalScore).padStart(6, '0');
+      document.getElementById('go-score-text').textContent = 'TREATS: ' + String(this.totalScore).padStart(6, '0');
       this._showScreen('screen-gameover');
     }
   }
 
   onBossDefeated() {
-    // Birdo defeated - level 3 -> next
+    // Big Dog defeated - backyard cleared
     setTimeout(() => this._nextLevel(), 1500);
   }
 
@@ -314,7 +314,7 @@ class Game {
     setTimeout(() => {
       this.state = STATE.WIN;
       this.totalScore += this.player.score;
-      document.getElementById('win-score-text').textContent = 'FINAL SCORE: ' + String(this.totalScore).padStart(6, '0');
+      document.getElementById('win-score-text').textContent = 'TOTAL TREATS: ' + String(this.totalScore).padStart(6, '0');
       this._showScreen('screen-win');
       Audio.levelClear();
     }, 2000);
@@ -325,7 +325,7 @@ class Game {
     if (this.currentLevel >= LEVEL_BUILDERS.length) {
       this.state = STATE.WIN;
       this.totalScore += this.player.score;
-      document.getElementById('win-score-text').textContent = 'FINAL SCORE: ' + String(this.totalScore).padStart(6, '0');
+      document.getElementById('win-score-text').textContent = 'TOTAL TREATS: ' + String(this.totalScore).padStart(6, '0');
       this._showScreen('screen-win');
       return;
     }
@@ -522,7 +522,7 @@ class Game {
     ctx.fillStyle = '#fff';
     ctx.fillText('← → : Move', 12, 36);
     ctx.fillText('Space/X : Jump', 12, 48);
-    ctx.fillText('Shift/Z/B : Run / Pickup / Throw', 12, 60);
+    ctx.fillText('Shift/Z/B : Grab / Throw Treats', 12, 60);
     ctx.fillText('↓ : Crouch', 12, 72);
     ctx.restore();
   }

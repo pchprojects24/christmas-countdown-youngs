@@ -6,55 +6,55 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>Super Mario Bros 2 Clone</title>
+  <title>Treat Hunt - A Cat Family Adventure</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="game-container">
     <!-- Character Select Screen -->
     <div id="screen-select" class="screen active">
-      <h1 class="title-text">SUPER MARIO BROS. 2</h1>
-      <p class="subtitle">SELECT YOUR CHARACTER</p>
+      <h1 class="title-text">TREAT HUNT</h1>
+      <p class="subtitle">COLLECT TREATS FOR THE CATS!</p>
       <div id="character-grid">
-        <div class="char-card" data-char="mario">
-          <canvas class="char-preview" width="64" height="64" data-char="mario"></canvas>
-          <div class="char-name">MARIO</div>
+        <div class="char-card" data-char="marice">
+          <canvas class="char-preview" width="64" height="96" data-char="marice"></canvas>
+          <div class="char-name">MARICE</div>
           <div class="char-stats">
             <span>Speed: ★★★☆</span>
             <span>Jump: ★★★☆</span>
-            <span>Lift: ★★★☆</span>
+            <span>Grab: ★★★☆</span>
           </div>
-          <div class="char-desc">All-around hero. Great balance of speed and jumping ability.</div>
+          <div class="char-desc">Cat mom! Balanced speed and jumping to rescue treats.</div>
         </div>
-        <div class="char-card" data-char="luigi">
-          <canvas class="char-preview" width="64" height="64" data-char="luigi"></canvas>
-          <div class="char-name">LUIGI</div>
+        <div class="char-card" data-char="beatrice">
+          <canvas class="char-preview" width="64" height="96" data-char="beatrice"></canvas>
+          <div class="char-name">BEATRICE</div>
           <div class="char-stats">
             <span>Speed: ★★☆☆</span>
             <span>Jump: ★★★★</span>
-            <span>Lift: ★★★☆</span>
+            <span>Grab: ★★★☆</span>
           </div>
-          <div class="char-desc">Floaty jump and long air-time. Great for tricky platforms.</div>
+          <div class="char-desc">Graceful leaper! Highest jumps with elegant air-time.</div>
         </div>
-        <div class="char-card" data-char="toad">
-          <canvas class="char-preview" width="64" height="64" data-char="toad"></canvas>
-          <div class="char-name">TOAD</div>
+        <div class="char-card" data-char="alice">
+          <canvas class="char-preview" width="64" height="96" data-char="alice"></canvas>
+          <div class="char-name">ALICE</div>
           <div class="char-stats">
             <span>Speed: ★★★★</span>
             <span>Jump: ★★☆☆</span>
-            <span>Lift: ★★★★</span>
+            <span>Grab: ★★★★</span>
           </div>
-          <div class="char-desc">Fastest runner, strongest lifter. Short jump height.</div>
+          <div class="char-desc">Speedy pouncer! Fastest runner with strong grabbing.</div>
         </div>
-        <div class="char-card" data-char="peach">
-          <canvas class="char-preview" width="64" height="64" data-char="peach"></canvas>
-          <div class="char-name">PEACH</div>
+        <div class="char-card" data-char="olive">
+          <canvas class="char-preview" width="64" height="96" data-char="olive"></canvas>
+          <div class="char-name">OLIVE</div>
           <div class="char-stats">
             <span>Speed: ★★☆☆</span>
             <span>Jump: ★★★☆</span>
-            <span>Lift: ★★☆☆</span>
+            <span>Grab: ★★☆☆</span>
           </div>
-          <div class="char-desc">Float ability! Hold jump to glide through the air.</div>
+          <div class="char-desc">Fluffy floater! Hold jump to drift gracefully down.</div>
         </div>
       </div>
       <p class="hint-text">Click a character or press 1-4 to select</p>
@@ -63,9 +63,9 @@
     <!-- Game Screen -->
     <div id="screen-game" class="screen">
       <div id="hud">
-        <div class="hud-item"><span class="hud-label">PLAYER</span><span id="hud-player">MARIO</span></div>
-        <div class="hud-item"><span class="hud-label">SCORE</span><span id="hud-score">000000</span></div>
-        <div class="hud-item"><span class="hud-label">WORLD</span><span id="hud-world">1-1</span></div>
+        <div class="hud-item"><span class="hud-label">PLAYER</span><span id="hud-player">MARICE</span></div>
+        <div class="hud-item"><span class="hud-label">TREATS</span><span id="hud-score">000000</span></div>
+        <div class="hud-item"><span class="hud-label">ROOM</span><span id="hud-world">Living Room</span></div>
         <div class="hud-item"><span class="hud-label">LIVES</span><span id="hud-lives">♥♥♥</span></div>
         <div class="hud-item"><span class="hud-label">HP</span><span id="hud-hp">●●●</span></div>
       </div>
@@ -84,19 +84,20 @@
 
     <!-- Game Over Screen -->
     <div id="screen-gameover" class="screen">
-      <h2 class="go-title">GAME OVER</h2>
+      <h2 class="go-title">NO MORE LIVES!</h2>
+      <p class="go-sub">The cats are still hungry...</p>
       <p id="go-score-text"></p>
-      <button class="menu-btn" id="btn-retry">PLAY AGAIN</button>
-      <button class="menu-btn" id="btn-select">CHARACTER SELECT</button>
+      <button class="menu-btn" id="btn-retry">TRY AGAIN</button>
+      <button class="menu-btn" id="btn-select">PICK CHARACTER</button>
     </div>
 
     <!-- Win Screen -->
     <div id="screen-win" class="screen">
-      <h2 class="win-title">YOU WIN!</h2>
+      <h2 class="win-title">TREATS SECURED!</h2>
       <p id="win-score-text"></p>
-      <p class="win-sub">WART has been defeated!</p>
+      <p class="win-sub">The Vet has been defeated! The cats feast tonight!</p>
       <button class="menu-btn" id="btn-play-again">PLAY AGAIN</button>
-      <button class="menu-btn" id="btn-select-win">CHARACTER SELECT</button>
+      <button class="menu-btn" id="btn-select-win">PICK CHARACTER</button>
     </div>
 
     <!-- Pause Screen -->

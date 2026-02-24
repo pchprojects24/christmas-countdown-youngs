@@ -373,10 +373,10 @@ class Player extends Entity {
     const scale = 2;
 
     switch (this.charKey) {
-      case 'mario': drawMarioSprite(ctx, frame, 1, scale); break;
-      case 'luigi': drawLuigiSprite(ctx, frame, 1, scale); break;
-      case 'toad':  drawToadSprite(ctx, frame, 1, scale);  break;
-      case 'peach': drawPeachSprite(ctx, frame, 1, scale); break;
+      case 'marice':   drawMariceSprite(ctx, frame, 1, scale); break;
+      case 'beatrice': drawBeatriceSprite(ctx, frame, 1, scale); break;
+      case 'alice':    drawAliceSprite(ctx, frame, 1, scale);  break;
+      case 'olive':    drawOliveSprite(ctx, frame, 1, scale); break;
     }
 
     // Ducking overlay
@@ -387,9 +387,9 @@ class Player extends Entity {
       ctx.globalAlpha = 1;
     }
 
-    // Floating sparkles for Peach
+    // Floating sparkles for Olive (fluffy cat drifting)
     if (this.floating) {
-      ctx.fillStyle = 'rgba(255, 180, 255, 0.7)';
+      ctx.fillStyle = 'rgba(200, 180, 150, 0.7)';
       for (let i = 0; i < 4; i++) {
         const angle = (this.animTimer * 0.1 + i * Math.PI / 2);
         ctx.beginPath();

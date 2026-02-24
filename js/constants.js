@@ -3,70 +3,78 @@ const TILE = 32;          // tile size in pixels
 const GRAVITY = 0.55;
 const TERMINAL_VEL = 14;
 const CANVAS_W = 800;
-const CANVAS_H = 800;  // Match full level height (25 tiles * 32px) so the player spawns on-screen
+const CANVAS_H = 800;
 
 // Physics tuning
-const COYOTE_FRAMES = 6;       // frames after leaving ground where jump still works
-const JUMP_BUFFER_FRAMES = 8;  // frames before landing where jump input is remembered
-const APEX_THRESHOLD = 2.0;    // vy threshold for apex hang (reduced gravity near peak)
-const APEX_GRAVITY_MULT = 0.4; // gravity multiplier during apex hang
-const GROUND_ACCEL = 0.65;     // horizontal acceleration on ground
-const GROUND_DECEL = 0.78;     // horizontal deceleration on ground (friction)
-const AIR_ACCEL = 0.45;        // horizontal acceleration in air
-const AIR_DECEL = 0.92;        // horizontal deceleration in air (less friction = more slide)
-const CAM_LOOKAHEAD = 60;      // pixels of camera lookahead in movement direction
-const CAM_LOOKAHEAD_SPEED = 0.04; // how fast the lookahead catches up
+const COYOTE_FRAMES = 6;
+const JUMP_BUFFER_FRAMES = 8;
+const APEX_THRESHOLD = 2.0;
+const APEX_GRAVITY_MULT = 0.4;
+const GROUND_ACCEL = 0.65;
+const GROUND_DECEL = 0.78;
+const AIR_ACCEL = 0.45;
+const AIR_DECEL = 0.92;
+const CAM_LOOKAHEAD = 60;
+const CAM_LOOKAHEAD_SPEED = 0.04;
 
 // Character definitions
 const CHARACTERS = {
-  mario: {
-    name: 'MARIO',
-    color: '#e83a00',
-    hatColor: '#e83a00',
-    overallColor: '#3a6fff',
+  marice: {
+    name: 'MARICE',
+    color: '#4a7ab5',      // blue coat accent
+    hatColor: '#f5e6d0',   // hair color (dark blonde/brown)
+    overallColor: '#eee',  // white coat
     speed: 3.4,
     jumpPower: -11.5,
-    jumpHold: 0.45,    // air control multiplier
+    jumpHold: 0.45,
     liftSpeed: 1.0,
     floatAbility: false,
-    spriteKey: 'mario'
+    spriteKey: 'marice',
+    desc: 'Cat mom! Balanced speed and jumping to rescue treats.',
+    stats: { speed: 3, jump: 3, grab: 3 }
   },
-  luigi: {
-    name: 'LUIGI',
-    color: '#2a9e00',
-    hatColor: '#2a9e00',
-    overallColor: '#2a6fff',
+  beatrice: {
+    name: 'BEATRICE',
+    color: '#1a1a1a',      // black fur
+    hatColor: '#fff',      // white neck
+    overallColor: '#1a1a1a',
     speed: 3.0,
     jumpPower: -13.2,
     jumpHold: 0.6,
     liftSpeed: 1.0,
     floatAbility: false,
-    spriteKey: 'luigi'
+    spriteKey: 'beatrice',
+    desc: 'Graceful leaper! Highest jumps with elegant air-time.',
+    stats: { speed: 2, jump: 4, grab: 3 }
   },
-  toad: {
-    name: 'TOAD',
-    color: '#e8e8e8',
-    hatColor: '#fff',
-    overallColor: '#f44',
+  alice: {
+    name: 'ALICE',
+    color: '#f0e8d8',      // cream/white fur
+    hatColor: '#222',      // black nose mark
+    overallColor: '#e8dcc8',
     speed: 4.2,
     jumpPower: -9.8,
     jumpHold: 0.35,
     liftSpeed: 1.35,
     floatAbility: false,
-    spriteKey: 'toad'
+    spriteKey: 'alice',
+    desc: 'Speedy pouncer! Fastest runner with strong grabbing.',
+    stats: { speed: 4, jump: 2, grab: 4 }
   },
-  peach: {
-    name: 'PEACH',
-    color: '#f9a0c0',
-    hatColor: '#f9a0c0',
-    overallColor: '#f9a0c0',
+  olive: {
+    name: 'OLIVE',
+    color: '#c8b898',      // warm grey/tabby
+    hatColor: '#d8c8a8',   // lighter fur
+    overallColor: '#b8a888',
     speed: 2.8,
     jumpPower: -11.0,
     jumpHold: 0.5,
     liftSpeed: 0.85,
     floatAbility: true,
-    floatDuration: 90,   // frames
-    spriteKey: 'peach'
+    floatDuration: 90,
+    spriteKey: 'olive',
+    desc: 'Fluffy floater! Hold jump to drift gracefully down.',
+    stats: { speed: 2, jump: 3, grab: 2 }
   }
 };
 
@@ -84,15 +92,18 @@ const T = {
   PIPE_TR: 9,
   PIPE_BL: 10,
   PIPE_BR: 11,
-  VEGE:    12,  // veggie spawn tile (background)
-  DOOR:    13,  // level exit door
+  VEGE:    12,  // treat spawn tile
+  DOOR:    13,  // level exit (cat door)
   COIN:    14,
-  SOLID_INVISIBLE: 15
+  SOLID_INVISIBLE: 15,
+  CARPET:  16,
+  SHELF:   17
 };
 
 // Solid tiles set
 const SOLID_TILES = new Set([T.GROUND, T.BRICK, T.DIRT, T.GRASS, T.SAND,
-  T.PIPE_TL, T.PIPE_TR, T.PIPE_BL, T.PIPE_BR, T.SOLID_INVISIBLE]);
+  T.PIPE_TL, T.PIPE_TR, T.PIPE_BL, T.PIPE_BR, T.SOLID_INVISIBLE,
+  T.CARPET, T.SHELF]);
 
 // Score values
 const SCORE = {
@@ -106,19 +117,19 @@ const SCORE = {
 
 // Enemy types
 const ENEMY_TYPES = {
-  SHYGUY:   'shyguy',
-  BIRDO:    'birdo',
-  SNIFIT:   'snifit',
+  SHYGUY:   'vacuum',
+  BIRDO:    'bigdog',
+  SNIFIT:   'spraybottle',
   TROUTER:  'trouter',
-  NINJI:    'ninji',
+  NINJI:    'cucumber',
   SPARKY:   'sparky'
 };
 
 // Projectile types
 const PROJ_TYPES = {
-  VEGGIE:  'veggie',
-  BIRDO_EGG: 'birdo_egg',
-  SNIFIT_BALL: 'snifit_ball'
+  VEGGIE:     'treat',
+  BIRDO_EGG:  'tennis_ball',
+  SNIFIT_BALL: 'water_spray'
 };
 
 // States
