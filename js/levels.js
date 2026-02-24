@@ -398,69 +398,75 @@ function createLevel1() {
 function createLevel2() {
   const W = 90;
   const rows = [];
-  for (let r = 0; r < 6; r++) rows.push(makeRow(W));
-  // Cushion cloud platforms
-  rows.push(buildRow(W, [[8,11,T.CLOUD],[25,28,T.CLOUD],[45,48,T.CLOUD],[65,68,T.CLOUD],[80,84,T.CLOUD]]));
+  for (let r = 0; r < 4; r++) rows.push(makeRow(W));
+  // Upper cushion cloud platforms (lowered from row 6 to row 4)
+  rows.push(buildRow(W, [[8,11,T.CLOUD],[20,24,T.CLOUD],[35,39,T.CLOUD],[50,54,T.CLOUD],[65,69,T.CLOUD],[80,84,T.CLOUD]]));
   rows.push(makeRow(W));
-  // Counter/shelf platforms
-  rows.push(buildRow(W, [[2,5,T.SAND],[10,14,T.SAND],[18,22,T.SAND],[30,35,T.SAND],[42,48,T.SAND],[55,62,T.SAND],[68,76,T.SAND],[82,89,T.SAND]]));
+  // High counter/shelf platforms (lowered from row 8 to row 6)
+  rows.push(buildRow(W, [[2,5,T.SAND],[10,14,T.SAND],[18,22,T.SAND],[28,33,T.SAND],[40,46,T.SAND],[52,59,T.SAND],[65,73,T.SAND],[78,85,T.SAND]]));
+  rows.push(makeRow(W));
+  // Mid-level platforms (lowered from row 11 to row 8, with more platforms added)
+  rows.push(buildRow(W, [[0,6,T.SAND],[10,16,T.SAND],[22,28,T.SAND],[34,40,T.SAND],[46,52,T.SAND],[58,64,T.SAND],[70,76,T.SAND],[82,89,T.SAND]]));
+  rows.push(makeRow(W));
+  // Lower platforms (lowered from row 14 to row 10, with more coverage)
+  rows.push(buildRow(W, [[0,8,T.SAND],[12,20,T.SAND],[26,34,T.SAND],[40,48,T.SAND],[54,62,T.SAND],[68,76,T.SAND],[82,89,T.SAND]]));
+  rows.push(makeRow(W));
+  // Additional stepping platforms for easier progression
+  rows.push(buildRow(W, [[4,10,T.CLOUD],[18,24,T.CLOUD],[32,38,T.CLOUD],[46,52,T.CLOUD],[60,66,T.CLOUD],[74,80,T.CLOUD]]));
   rows.push(makeRow(W)); rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,6,T.SAND],[12,18,T.SAND],[24,30,T.SAND],[36,43,T.SAND],[50,58,T.SAND],[64,72,T.SAND],[78,89,T.SAND]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,8,T.SAND],[14,22,T.SAND],[28,36,T.SAND],[42,50,T.SAND],[56,65,T.SAND],[70,79,T.SAND],[84,89,T.SAND]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  // Cat tower posts
+  // Cat tower posts (moved down slightly)
   rows.push(buildRow(W, [[15,15,T.PIPE_TL],[16,16,T.PIPE_TR],[45,45,T.PIPE_TL],[46,46,T.PIPE_TR],[75,75,T.PIPE_TL],[76,76,T.PIPE_TR]]));
   rows.push(buildRow(W, [[15,15,T.PIPE_BL],[16,16,T.PIPE_BR],[45,45,T.PIPE_BL],[46,46,T.PIPE_BR],[75,75,T.PIPE_BL],[76,76,T.PIPE_BR]]));
+  rows.push(makeRow(W)); rows.push(makeRow(W)); rows.push(makeRow(W));
   // Kitchen tile floor
   rows.push(buildRow(W, [[0,89,T.BRICK]]));
   rows.push(buildRow(W, [[0,89,T.DIRT]]));
   rows.push(buildRow(W, [[0,89,T.DIRT]]));
   rows.push(buildRow(W, [[0,89,T.DIRT]]));
 
-  // Treat spots
-  rows[8] = buildRow(W, [[3,3,T.VEGE],[12,12,T.VEGE],[20,20,T.VEGE],[32,32,T.VEGE],[44,44,T.VEGE],[57,57,T.VEGE],[70,70,T.VEGE]]);
+  // Treat spots (adjusted to new row positions)
+  rows[6] = buildRow(W, [[3,3,T.VEGE],[12,12,T.VEGE],[20,20,T.VEGE],[30,30,T.VEGE],[42,42,T.VEGE],[55,55,T.VEGE],[68,68,T.VEGE]]);
 
   while (rows.length < 25) rows.push(makeRow(W));
 
-  rows[22][87] = T.DOOR;
+  rows[20][87] = T.DOOR;
 
   return {
     tiles: rows,
     name: 'Kitchen',
     theme: 'kitchen',
     bgColor: '#f0ece4', bgColor2: '#e0d8c8',
-    spawnX: 1, spawnY: 20,
+    spawnX: 1, spawnY: 18,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 12, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 20, ty: 21 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 30, ty: 21, color: 'blue' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 38, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 48, ty: 21 },
-      { type: ENEMY_TYPES.NINJI,   tx: 55, ty: 21 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 65, ty: 21, color: 'pink' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 75, ty: 21 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 82, ty: 21, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 10, ty: 19, color: 'red' },
+      { type: ENEMY_TYPES.SNIFIT,  tx: 18, ty: 19 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 28, ty: 19, color: 'blue' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 38, ty: 19, color: 'red' },
+      { type: ENEMY_TYPES.SNIFIT,  tx: 48, ty: 19 },
+      { type: ENEMY_TYPES.NINJI,   tx: 56, ty: 19 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 65, ty: 19, color: 'pink' },
+      { type: ENEMY_TYPES.SNIFIT,  tx: 73, ty: 19 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 82, ty: 19, color: 'green' },
     ],
     vegetables: [
-      { tx: 3, ty: 8, type: 'yarn' },
-      { tx: 12, ty: 8, type: 'mouse' },
-      { tx: 20, ty: 8, type: 'feather' },
-      { tx: 32, ty: 8, type: 'yarn' },
-      { tx: 44, ty: 8, type: 'mouse' },
-      { tx: 57, ty: 8, type: 'yarn' },
-      { tx: 70, ty: 8, type: 'feather' },
-      { tx: 5, ty: 21, type: 'yarn' },
-      { tx: 25, ty: 21, type: 'mouse' },
-      { tx: 50, ty: 21, type: 'feather' },
-      { tx: 70, ty: 21, type: 'yarn' },
+      { tx: 3, ty: 6, type: 'yarn' },
+      { tx: 12, ty: 6, type: 'mouse' },
+      { tx: 20, ty: 6, type: 'feather' },
+      { tx: 30, ty: 6, type: 'yarn' },
+      { tx: 42, ty: 6, type: 'mouse' },
+      { tx: 55, ty: 6, type: 'yarn' },
+      { tx: 68, ty: 6, type: 'feather' },
+      { tx: 5, ty: 19, type: 'yarn' },
+      { tx: 24, ty: 19, type: 'mouse' },
+      { tx: 50, ty: 19, type: 'feather' },
+      { tx: 70, ty: 19, type: 'yarn' },
     ],
     coins: [
-      {tx:4,ty:7},{tx:5,ty:7},
-      {tx:18,ty:7},{tx:19,ty:7},
-      {tx:32,ty:7},{tx:33,ty:7},
-      {tx:50,ty:7},{tx:51,ty:7},
-      {tx:64,ty:7},{tx:65,ty:7},
+      {tx:9,ty:4},{tx:10,ty:4},
+      {tx:22,ty:4},{tx:23,ty:4},
+      {tx:37,ty:4},{tx:38,ty:4},
+      {tx:52,ty:4},{tx:53,ty:4},
+      {tx:67,ty:4},{tx:68,ty:4},
     ]
   };
 }
