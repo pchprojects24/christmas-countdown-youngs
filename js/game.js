@@ -265,8 +265,18 @@ class Game {
   // ===== CAMERA =====
   _updateCamera() {
     if (!this.player || !this.level) return;
-    const targetX = this.player.centerX - CANVAS_W / 2;
-    this.camX += (targetX - this.camX) * 0.12;
+
+    // Lookahead in movement direction
+    if (this._camLookahead === undefined) this._camLookahead = 0;
+    const targetLookahead = this.player.facingDir * CAM_LOOKAHEAD * (Math.abs(this.player.vx) / (this.player.speed * 1.35));
+    this._camLookahead += (targetLookahead - this._camLookahead) * CAM_LOOKAHEAD_SPEED;
+
+    const targetX = this.player.centerX - CANVAS_W / 2 + this._camLookahead;
+
+    // Smoother camera with faster catch-up when far away
+    const dist = Math.abs(targetX - this.camX);
+    const lerpSpeed = dist > 150 ? 0.18 : 0.10;
+    this.camX += (targetX - this.camX) * lerpSpeed;
     this.camX = Math.max(0, Math.min(this.camX, this.level.widthPx - CANVAS_W));
   }
 

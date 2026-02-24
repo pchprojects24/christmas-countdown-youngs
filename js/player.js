@@ -20,6 +20,10 @@ class Player extends Entity {
     this.isJumping = false;
     this.wasOnGround = false;
 
+    // Coyote time & jump buffering
+    this.coyoteTimer = 0;    // frames since leaving ground
+    this.jumpBuffer = 0;     // frames since jump was pressed
+
     // Peach float
     this.floating = false;
     this.floatTimer = 0;
@@ -35,6 +39,11 @@ class Player extends Entity {
     this.animTimer = 0;
     this.walkCycle = 0;
     this.crouching = false;
+
+    // Visual juice
+    this.squashY = 0;      // squash/stretch offset (positive = squashed)
+    this.landingImpact = 0; // frames of landing impact effect
+    this.prevVy = 0;        // previous frame vy for landing detection
 
     // Duck (SMB2 style - hold down to crouch)
     this.ducking = false;
@@ -149,6 +158,11 @@ class Player extends Entity {
     if (this.invincible > 0) this.invincible--;
     if (this.throwCooldown > 0) this.throwCooldown--;
 
+    // Decay visual juice
+    this.squashY *= 0.8;
+    if (Math.abs(this.squashY) < 0.5) this.squashY = 0;
+    if (this.landingImpact > 0) this.landingImpact--;
+
     // Handle pulling
     if (this.pulling) {
       const done = this.pulling.updatePull();
@@ -173,33 +187,71 @@ class Player extends Entity {
 
     this.ducking = down && this.onGround && !this.carrying;
 
-    // Horizontal movement
-    const spd = this.speed * (run ? 1.35 : 1.0);
-    if (!this.pulling) {
-      if (left)  { this.vx = -spd; this.facingDir = -1; }
-      else if (right) { this.vx = spd; this.facingDir = 1; }
-      else { this.vx *= 0.75; }
+    // --- Coyote time tracking ---
+    if (this.onGround) {
+      this.coyoteTimer = COYOTE_FRAMES;
+    } else {
+      if (this.coyoteTimer > 0) this.coyoteTimer--;
     }
 
-    // Jump
+    // --- Jump buffer tracking ---
     const jumpJustPressed = KEYS_DOWN['jump'] || KEYS_DOWN[' '];
-    if (this.onGround && jumpJustPressed) {
+    if (jumpJustPressed) {
+      this.jumpBuffer = JUMP_BUFFER_FRAMES;
+    } else {
+      if (this.jumpBuffer > 0) this.jumpBuffer--;
+    }
+
+    // --- Horizontal movement with acceleration ---
+    const targetSpeed = this.speed * (run ? 1.35 : 1.0);
+    if (!this.pulling) {
+      const accel = this.onGround ? GROUND_ACCEL : AIR_ACCEL;
+      const decel = this.onGround ? GROUND_DECEL : AIR_DECEL;
+
+      if (left) {
+        this.vx = Math.max(this.vx - accel * targetSpeed, -targetSpeed);
+        this.facingDir = -1;
+      } else if (right) {
+        this.vx = Math.min(this.vx + accel * targetSpeed, targetSpeed);
+        this.facingDir = 1;
+      } else {
+        // Deceleration
+        this.vx *= decel;
+        if (Math.abs(this.vx) < 0.15) this.vx = 0;
+      }
+    }
+
+    // --- Jump with coyote time and jump buffering ---
+    const canJump = this.onGround || this.coyoteTimer > 0;
+    const wantsJump = this.jumpBuffer > 0;
+
+    if (canJump && wantsJump && !this.isJumping) {
       this.vy = this.jumpPower;
       this.isJumping = true;
       this.jumpHeld = 0;
       this.floating = false;
       this.floatTimer = 0;
+      this.coyoteTimer = 0;  // consume coyote time
+      this.jumpBuffer = 0;   // consume jump buffer
+      this.squashY = -4;     // stretch on jump
       Audio.jump();
+      // Jump dust particles
+      game.spawnParticles(this.centerX, this.bottom, '#c8b898', 4);
     }
 
-    // Jump hold (sustained lift)
+    // --- Jump hold (sustained lift) with improved curve ---
     if (jump && this.isJumping && this.vy < 0) {
       this.jumpHeld++;
-      if (this.jumpHeld < 14) {
-        this.vy -= 0.3 * this.cfg.jumpHold;
+      if (this.jumpHeld < 18) {
+        // Stronger at start, fading out for natural feel
+        const holdStrength = 1.0 - (this.jumpHeld / 18);
+        this.vy -= 0.35 * this.cfg.jumpHold * holdStrength;
       }
     }
     if (!jump) { this.isJumping = false; }
+
+    // --- Apex hang (reduced gravity near jump peak) ---
+    const atApex = !this.onGround && Math.abs(this.vy) < APEX_THRESHOLD && !this.floating;
 
     // Peach float
     if (this.cfg.floatAbility && jump && !this.onGround && this.vy > 0) {
@@ -217,13 +269,36 @@ class Player extends Entity {
     }
     if (this.onGround) { this.floating = false; this.floatTimer = 0; }
 
-    // Gravity
-    this.applyGravity();
+    // --- Gravity with apex hang ---
+    if (atApex) {
+      this.vy += GRAVITY * APEX_GRAVITY_MULT;
+    } else {
+      this.applyGravity();
+    }
+
+    // Store previous vy for landing detection
+    this.prevVy = this.vy;
 
     // Move and collide
     const wasOnGround = this.onGround;
     this.moveAndCollide(level);
-    if (!wasOnGround && this.onGround) Audio.land();
+
+    // --- Landing detection with impact feedback ---
+    if (!wasOnGround && this.onGround) {
+      Audio.land();
+      const impactSpeed = Math.abs(this.prevVy);
+      if (impactSpeed > 3) {
+        // Squash on landing proportional to fall speed
+        this.squashY = Math.min(impactSpeed * 0.7, 6);
+        this.landingImpact = 8;
+        // Landing dust particles
+        const dustCount = Math.min(Math.floor(impactSpeed * 0.8), 8);
+        game.spawnParticles(this.centerX, this.bottom, '#c8b898', dustCount);
+      }
+    }
+
+    // If we just left the ground without jumping, don't reset coyote (it's already tracking)
+    // But if we jumped, coyote was already consumed above
 
     // Clamp to level bounds
     if (this.x < 0) { this.x = 0; this.vx = 0; }
@@ -250,10 +325,20 @@ class Player extends Entity {
       }
     }
 
+    // --- Running dust particles ---
+    if (this.onGround && run && Math.abs(this.vx) > targetSpeed * 0.8) {
+      if (this.animTimer % 6 === 0) {
+        game.spawnParticles(this.centerX - this.facingDir * 8, this.bottom, '#c8b898', 2);
+      }
+    }
+
     // Animation
     this.animTimer++;
-    if (Math.abs(this.vx) > 0.5) {
-      if (this.animTimer % 8 === 0) this.walkCycle = (this.walkCycle + 1) % 4;
+    const walkSpeed = Math.abs(this.vx);
+    if (walkSpeed > 0.5) {
+      // Faster animation when running faster
+      const animRate = walkSpeed > targetSpeed * 0.9 ? 5 : 8;
+      if (this.animTimer % animRate === 0) this.walkCycle = (this.walkCycle + 1) % 4;
     } else {
       this.walkCycle = 0;
     }
@@ -269,12 +354,19 @@ class Player extends Entity {
     ctx.save();
     ctx.imageSmoothingEnabled = false;
 
+    // Squash/stretch transform
+    const squash = this.squashY;
+    const scaleY = 1 - squash * 0.02;
+    const scaleX = 1 + squash * 0.015;
+    const yOffset = squash > 0 ? squash * 0.5 : squash * 0.3;
+
     if (this.facingDir === -1) {
-      ctx.translate(sx + this.w, sy);
-      ctx.scale(-1, 1);
+      ctx.translate(sx + this.w, sy + yOffset);
+      ctx.scale(-scaleX, scaleY);
       ctx.translate(-this.w/2 + 2, 0);
     } else {
-      ctx.translate(sx - 2, sy);
+      ctx.translate(sx - 2, sy + yOffset);
+      ctx.scale(scaleX, scaleY);
     }
 
     const frame = (this.walkCycle === 1 || this.walkCycle === 3) ? 1 : 0;
