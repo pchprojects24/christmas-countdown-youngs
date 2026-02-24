@@ -9,7 +9,7 @@
 }
 
 body {
-  background: #000;
+  background: #1a1410;
   color: #fff;
   font-family: 'Courier New', monospace;
   display: flex;
@@ -54,26 +54,26 @@ body {
 
 /* ===== CHARACTER SELECT ===== */
 #screen-select {
-  background: linear-gradient(180deg, #1a0a4a 0%, #0d1a4a 50%, #1a0a4a 100%);
+  background: linear-gradient(180deg, #2a1a0a 0%, #1a1408 50%, #2a1a0a 100%);
   padding: 20px;
 }
 
 .title-text {
-  font-size: clamp(20px, 5vw, 42px);
-  color: #ffe04b;
-  text-shadow: 3px 3px 0 #c84800, 6px 6px 0 #7a2900;
-  letter-spacing: 2px;
+  font-size: clamp(24px, 6vw, 48px);
+  color: #f0a860;
+  text-shadow: 3px 3px 0 #8a4a10, 6px 6px 0 #4a2800;
+  letter-spacing: 3px;
   text-align: center;
   animation: titlePulse 2s ease-in-out infinite;
 }
 @keyframes titlePulse {
-  0%, 100% { text-shadow: 3px 3px 0 #c84800, 6px 6px 0 #7a2900; }
-  50% { text-shadow: 3px 3px 0 #ff8c00, 6px 6px 0 #c84800, 0 0 20px #ffe04b; }
+  0%, 100% { text-shadow: 3px 3px 0 #8a4a10, 6px 6px 0 #4a2800; }
+  50% { text-shadow: 3px 3px 0 #c88030, 6px 6px 0 #8a4a10, 0 0 20px #f0a860; }
 }
 
 .subtitle {
   font-size: clamp(10px, 2.5vw, 16px);
-  color: #ff6b6b;
+  color: #e8a060;
   letter-spacing: 4px;
   text-align: center;
 }
@@ -92,8 +92,8 @@ body {
 }
 
 .char-card {
-  background: rgba(0,0,0,0.6);
-  border: 3px solid #444;
+  background: rgba(30,20,10,0.8);
+  border: 3px solid #5a4020;
   border-radius: 8px;
   padding: 12px 8px;
   cursor: pointer;
@@ -104,18 +104,18 @@ body {
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 .char-card:hover, .char-card.selected {
-  border-color: #ffe04b;
-  background: rgba(255,224,75,0.1);
+  border-color: #f0a860;
+  background: rgba(240,168,96,0.1);
   transform: scale(1.04);
 }
 .char-card canvas {
   image-rendering: pixelated;
   width: 80px;
-  height: 80px;
+  height: 120px;
 }
 .char-name {
   font-size: clamp(11px, 2vw, 14px);
-  color: #ffe04b;
+  color: #f0a860;
   font-weight: bold;
   letter-spacing: 1px;
 }
@@ -124,20 +124,20 @@ body {
   flex-direction: column;
   gap: 2px;
   font-size: clamp(8px, 1.5vw, 11px);
-  color: #aaa;
+  color: #bbb;
   text-align: left;
   width: 100%;
 }
 .char-desc {
   font-size: clamp(8px, 1.5vw, 10px);
-  color: #888;
+  color: #999;
   text-align: center;
   line-height: 1.3;
 }
 
 .hint-text {
   font-size: clamp(9px, 2vw, 12px);
-  color: #666;
+  color: #777;
   text-align: center;
   animation: blink 1.2s step-end infinite;
 }
@@ -147,7 +147,7 @@ body {
 #screen-game {
   flex-direction: column;
   gap: 0;
-  background: #000;
+  background: #1a1410;
 }
 
 #hud {
@@ -157,8 +157,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 4px 8px;
-  background: #111;
-  border-bottom: 2px solid #333;
+  background: #1a1408;
+  border-bottom: 2px solid #3a2a18;
   flex-shrink: 0;
 }
 .hud-item {
@@ -169,12 +169,12 @@ body {
 }
 .hud-label {
   font-size: 9px;
-  color: #888;
+  color: #997744;
   letter-spacing: 1px;
 }
 .hud-item > span:last-child {
   font-size: clamp(10px, 2vw, 13px);
-  color: #ffe04b;
+  color: #f0a860;
 }
 
 #game-canvas {
@@ -196,8 +196,8 @@ body {
   align-items: center;
   padding: 10px 20px;
   padding-bottom: max(10px, var(--sab));
-  background: #111;
-  border-top: 2px solid #333;
+  background: #1a1408;
+  border-top: 2px solid #3a2a18;
 }
 @media (max-width: 800px), (pointer: coarse) {
   #mobile-controls { display: flex; }
@@ -209,10 +209,10 @@ body {
 .dpad-btn, .action-btn {
   width: 60px;
   height: 60px;
-  background: rgba(255,255,255,0.15);
-  border: 2px solid rgba(255,255,255,0.35);
+  background: rgba(240,168,96,0.15);
+  border: 2px solid rgba(240,168,96,0.35);
   border-radius: 10px;
-  color: #fff;
+  color: #f0a860;
   font-size: 20px;
   cursor: pointer;
   touch-action: none;
@@ -226,62 +226,69 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(255,100,50,0.35);
+  background: rgba(240,120,60,0.35);
   font-weight: bold;
   font-size: 22px;
-  border: 3px solid rgba(255,130,60,0.5);
+  border: 3px solid rgba(240,140,70,0.5);
 }
 .action-btn#btn-jump {
-  background: rgba(80,160,255,0.35);
-  border-color: rgba(100,180,255,0.5);
+  background: rgba(100,180,120,0.35);
+  border-color: rgba(120,200,140,0.5);
+  color: #8ec8a0;
 }
 .dpad-btn:active, .action-btn:active {
-  background: rgba(255,255,255,0.4);
+  background: rgba(240,168,96,0.4);
   transform: scale(0.92);
 }
 
 /* ===== OVERLAY SCREENS ===== */
 #screen-gameover {
-  background: rgba(0,0,0,0.92);
+  background: rgba(20,10,0,0.92);
 }
 #screen-win {
-  background: linear-gradient(180deg, #0a2a0a 0%, #0a1a0a 100%);
+  background: linear-gradient(180deg, #0a1a08 0%, #0a1208 100%);
 }
 #screen-pause {
-  background: rgba(0,0,20,0.92);
+  background: rgba(10,8,0,0.92);
 }
 
 .go-title {
-  font-size: clamp(32px, 8vw, 64px);
-  color: #ff3a3a;
-  text-shadow: 3px 3px 0 #800000;
+  font-size: clamp(28px, 7vw, 56px);
+  color: #e06040;
+  text-shadow: 3px 3px 0 #602020;
   letter-spacing: 4px;
 }
+.go-sub {
+  color: #c09060;
+  font-size: clamp(10px, 2vw, 14px);
+}
 .win-title {
-  font-size: clamp(32px, 8vw, 64px);
-  color: #4eff4e;
-  text-shadow: 3px 3px 0 #008000;
+  font-size: clamp(28px, 7vw, 56px);
+  color: #80cc60;
+  text-shadow: 3px 3px 0 #204010;
   letter-spacing: 4px;
 }
 .win-sub {
-  color: #ffe04b;
+  color: #f0a860;
   font-size: clamp(12px, 2.5vw, 18px);
+  text-align: center;
+  max-width: 400px;
 }
 .pause-title {
   font-size: clamp(28px, 6vw, 48px);
-  color: #ffe04b;
-  text-shadow: 3px 3px 0 #c84800;
+  color: #f0a860;
+  text-shadow: 3px 3px 0 #8a4a10;
 }
 
 #go-score-text, #win-score-text {
   font-size: clamp(14px, 3vw, 20px);
-  color: #ffe04b;
+  color: #f0a860;
 }
 
 .menu-btn {
   padding: 10px 28px;
-  background: #c84800;
-  border: 3px solid #ff8c42;
+  background: #8a5020;
+  border: 3px solid #c08040;
   border-radius: 6px;
   color: #fff;
   font-family: 'Courier New', monospace;
@@ -291,7 +298,7 @@ body {
   transition: background 0.1s, transform 0.1s;
 }
 .menu-btn:hover {
-  background: #ff6a1a;
+  background: #b06830;
   transform: scale(1.05);
 }
 .menu-btn:active { transform: scale(0.97); }

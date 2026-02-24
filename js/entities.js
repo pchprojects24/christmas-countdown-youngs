@@ -9,7 +9,7 @@ class Entity {
     this.vy = 0;
     this.onGround = false;
     this.dead = false;
-    this.facingDir = 1; // 1=right, -1=left
+    this.facingDir = 1;
   }
 
   get left()   { return this.x; }
@@ -58,9 +58,9 @@ class Entity {
   }
 }
 
-// ===== VEGETABLE / PICKUP ITEM =====
+// ===== CAT TREAT / TOY (replaces Vegetable) =====
 class Vegetable extends Entity {
-  constructor(x, y, type = 'turnip') {
+  constructor(x, y, type = 'yarn') {
     super(x, y, 20, 20);
     this.type = type;
     this.inGround = true;
@@ -77,13 +77,13 @@ class Vegetable extends Entity {
 
   _pickColors(type) {
     const map = {
-      turnip:  { body: '#f0e0a0', top: '#2a8a00', spot: '#e07000' },
-      carrot:  { body: '#ff8c00', top: '#2a8a00', spot: '#e06000' },
-      radish:  { body: '#e84060', top: '#2a8a00', spot: '#c02040' },
-      mushroom:{ body: '#e83a00', top: '#8b4513', spot: '#fff' },
-      bomb:    { body: '#222',    top: '#444',    spot: '#f44' }
+      yarn:     { body: '#e04060', top: '#c03050', spot: '#ff6080' },  // red yarn ball
+      mouse:    { body: '#888', top: '#666', spot: '#aaa' },            // toy mouse
+      feather:  { body: '#4080c0', top: '#3060a0', spot: '#60a0e0' },  // feather wand
+      catnip:   { body: '#4a9e2a', top: '#2a6a00', spot: '#6abe3a' },  // catnip pouch
+      fish:     { body: '#f0a860', top: '#e09040', spot: '#ffc080' }   // fish toy
     };
-    return map[type] || map.turnip;
+    return map[type] || map.yarn;
   }
 
   startPull() { this.pullProgress = 0; }
@@ -136,33 +136,94 @@ class Vegetable extends Entity {
     const c = this.colors;
 
     if (this.inGround) {
-      // Just show top peeking out
+      // Show item peeking out of treat bowl
       const pullOff = this.pullProgress * this.h * 0.6;
-      ctx.fillStyle = c.top;
-      ctx.fillRect(sx + 4, sy - 8 + pullOff, 12, 8);
+      ctx.fillStyle = c.body;
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2, sy - 2 + pullOff, 6, 0, Math.PI*2);
+      ctx.fill();
+      // Sparkle hint
+      ctx.fillStyle = c.spot;
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2 + 2, sy - 4 + pullOff, 2, 0, Math.PI*2);
+      ctx.fill();
       return;
     }
 
-    // Body
-    ctx.fillStyle = c.body;
-    ctx.beginPath();
-    ctx.ellipse(sx + this.w/2, sy + this.h/2, this.w/2, this.h/2, 0, 0, Math.PI*2);
-    ctx.fill();
-    // Spots
-    ctx.fillStyle = c.spot;
-    ctx.beginPath();
-    ctx.arc(sx + this.w*0.3, sy + this.h*0.35, 3, 0, Math.PI*2);
-    ctx.arc(sx + this.w*0.65, sy + this.h*0.55, 2, 0, Math.PI*2);
-    ctx.fill();
-    // Leaves
-    ctx.fillStyle = c.top;
-    ctx.fillRect(sx + 6, sy - 6, 4, 8);
-    ctx.fillRect(sx + 10, sy - 8, 4, 8);
-    ctx.fillRect(sx + 2, sy - 4, 4, 6);
+    // Draw based on type
+    if (this.type === 'yarn') {
+      // Yarn ball
+      ctx.fillStyle = c.body;
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2, sy + this.h/2, this.w/2, 0, Math.PI*2);
+      ctx.fill();
+      // Yarn lines
+      ctx.strokeStyle = c.spot;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2, sy + this.h/2, this.w/3, 0.5, 3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(sx + this.w/2 + 2, sy + this.h/2 - 2, this.w/4, 1, 4);
+      ctx.stroke();
+    } else if (this.type === 'mouse') {
+      // Toy mouse
+      ctx.fillStyle = c.body;
+      ctx.beginPath();
+      ctx.ellipse(sx + this.w/2, sy + this.h/2, this.w/2, this.h/3, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Ears
+      ctx.fillStyle = c.spot;
+      ctx.beginPath();
+      ctx.arc(sx + 5, sy + 4, 3, 0, Math.PI*2);
+      ctx.arc(sx + this.w - 5, sy + 4, 3, 0, Math.PI*2);
+      ctx.fill();
+      // Tail
+      ctx.strokeStyle = c.top;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx + this.w, sy + this.h/2);
+      ctx.quadraticCurveTo(sx + this.w + 6, sy + 2, sx + this.w + 4, sy);
+      ctx.stroke();
+      // Eyes
+      ctx.fillStyle = '#000';
+      ctx.fillRect(sx + 6, sy + 8, 2, 2);
+    } else if (this.type === 'feather') {
+      // Feather toy
+      ctx.fillStyle = c.body;
+      ctx.beginPath();
+      ctx.ellipse(sx + this.w/2, sy + this.h/2, this.w/3, this.h/2, 0.3, 0, Math.PI*2);
+      ctx.fill();
+      // Feather barbs
+      ctx.fillStyle = c.spot;
+      ctx.fillRect(sx + 3, sy + 2, 2, this.h - 4);
+      ctx.fillRect(sx + 8, sy + 4, 2, this.h - 6);
+      // Shaft
+      ctx.strokeStyle = c.top;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(sx + this.w/2, sy);
+      ctx.lineTo(sx + this.w/2, sy + this.h);
+      ctx.stroke();
+    } else {
+      // Default: round treat/toy
+      ctx.fillStyle = c.body;
+      ctx.beginPath();
+      ctx.ellipse(sx + this.w/2, sy + this.h/2, this.w/2, this.h/2, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = c.spot;
+      ctx.beginPath();
+      ctx.arc(sx + this.w*0.3, sy + this.h*0.35, 3, 0, Math.PI*2);
+      ctx.fill();
+      // Leaf/top
+      ctx.fillStyle = c.top;
+      ctx.fillRect(sx + 6, sy - 4, 4, 6);
+      ctx.fillRect(sx + 10, sy - 6, 4, 6);
+    }
   }
 }
 
-// ===== COIN =====
+// ===== TREAT TOKEN (replaces Coin - now fish-shaped treats) =====
 class Coin extends Entity {
   constructor(x, y) {
     super(x, y, TILE, TILE);
@@ -178,18 +239,29 @@ class Coin extends Entity {
     if (this.collected) return;
     const sx = this.x - camX;
     const pulse = Math.sin(this.animFrame * 0.12) * 2;
-    ctx.fillStyle = '#ffe04b';
+    const cy = this.y + this.h/2 + pulse;
+
+    // Fish-shaped treat
+    ctx.fillStyle = '#f0a860';
     ctx.beginPath();
-    ctx.arc(sx + this.w/2, this.y + this.h/2 + pulse, this.w*0.28, 0, Math.PI*2);
+    ctx.ellipse(sx + this.w/2, cy, this.w*0.25, this.w*0.16, 0, 0, Math.PI*2);
     ctx.fill();
-    ctx.fillStyle = '#ffd000';
+    // Fish tail
     ctx.beginPath();
-    ctx.arc(sx + this.w/2, this.y + this.h/2 + pulse, this.w*0.18, 0, Math.PI*2);
+    ctx.moveTo(sx + this.w/2 + this.w*0.22, cy);
+    ctx.lineTo(sx + this.w/2 + this.w*0.38, cy - 4);
+    ctx.lineTo(sx + this.w/2 + this.w*0.38, cy + 4);
+    ctx.closePath();
+    ctx.fill();
+    // Fish eye
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(sx + this.w/2 - 3, cy - 1, 1.5, 0, Math.PI*2);
     ctx.fill();
     // Shine
     ctx.fillStyle = 'rgba(255,255,200,0.7)';
     ctx.beginPath();
-    ctx.arc(sx + this.w/2 - 2, this.y + this.h/2 + pulse - 2, 3, 0, Math.PI*2);
+    ctx.arc(sx + this.w/2 - 2, cy - 3, 2, 0, Math.PI*2);
     ctx.fill();
   }
 }
