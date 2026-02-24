@@ -40,7 +40,7 @@ class Level {
     for (let ty = y1; ty <= y2; ty++) {
       for (let tx = x1; tx <= x2; tx++) {
         const tile = this.getTile(tx, ty);
-        if (SOLID_TILES.has(tile)) {
+        if (SOLID_TILES.has(tile) || ONE_WAY_TILES.has(tile)) {
           cols.push({ tileX: tx, tileY: ty, tile });
         }
       }
@@ -327,33 +327,40 @@ function buildRow(width, specs) {
 // ===========================
 function createLevel1() {
   const W = 80;
+  const H = 25;
   const rows = [];
-  for (let r = 0; r < 8; r++) rows.push(makeRow(W));
-  // Row 8: cushion platforms (soft spots to land on)
-  rows.push(buildRow(W, [[10,13,T.CLOUD],[22,25,T.CLOUD],[35,39,T.CLOUD],[55,58,T.CLOUD],[68,72,T.CLOUD]]));
-  rows.push(makeRow(W));
-  // Row 10: shelf/furniture platforms
-  rows.push(buildRow(W, [[5,8,T.SHELF],[18,22,T.SHELF],[30,34,T.SHELF],[45,50,T.SHELF],[62,67,T.SHELF]]));
-  for (let r = 0; r < 3; r++) rows.push(makeRow(W));
-  // Row 14: carpet/rug platforms
-  rows.push(buildRow(W, [[0,4,T.GRASS],[8,14,T.GRASS],[20,28,T.GRASS],[33,40,T.GRASS],[44,52,T.GRASS],[57,65,T.GRASS],[70,79,T.GRASS]]));
-  rows.push(buildRow(W, [[0,4,T.DIRT],[8,14,T.DIRT],[20,28,T.DIRT],[33,40,T.DIRT],[44,52,T.DIRT],[57,65,T.DIRT],[70,79,T.DIRT]]));
-  for (let r = 0; r < 2; r++) rows.push(makeRow(W));
-  // Row 18: lower floor platforms
-  rows.push(buildRow(W, [[0,9,T.GRASS],[12,19,T.GRASS],[23,32,T.GRASS],[38,48,T.GRASS],[52,60,T.GRASS],[64,79,T.GRASS]]));
-  rows.push(buildRow(W, [[0,9,T.DIRT],[12,19,T.DIRT],[23,32,T.DIRT],[38,48,T.DIRT],[52,60,T.DIRT],[64,79,T.DIRT]]));
-  for (let r = 0; r < 2; r++) rows.push(makeRow(W));
-  // Row 22: main hardwood floor
-  rows.push(buildRow(W, [[0,79,T.GROUND]]));
-  rows.push(buildRow(W, [[0,79,T.DIRT]]));
-  rows.push(buildRow(W, [[0,79,T.DIRT]]));
+  for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  // Treat spots
-  rows[13] = buildRow(W, [
-    [5,5,T.VEGE],[18,18,T.VEGE],[31,31,T.VEGE],[47,47,T.VEGE],[63,63,T.VEGE]
-  ]);
+  // Row 22-24: Main hardwood floor (3 small pits to add challenge)
+  rows[22] = buildRow(W, [[0,8,T.GROUND],[11,27,T.GROUND],[30,46,T.GROUND],[49,65,T.GROUND],[68,79,T.GROUND]]);
+  rows[23] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,65,T.DIRT],[68,79,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,65,T.DIRT],[68,79,T.DIRT]]);
 
-  // Cat door at end
+  // Row 19-20: Lower shelves (solid - first step up, 3 tiles above floor)
+  rows[19] = buildRow(W, [[1,8,T.SHELF],[12,20,T.SHELF],[30,38,T.SHELF],[44,53,T.SHELF],[58,67,T.SHELF],[71,79,T.SHELF]]);
+  rows[20] = buildRow(W, [[1,8,T.DIRT],[12,20,T.DIRT],[30,38,T.DIRT],[44,53,T.DIRT],[58,67,T.DIRT],[71,79,T.DIRT]]);
+
+  // Row 16: Cloud cushions (one-way - jump through from below, 3 tiles above row 19)
+  rows[16] = buildRow(W, [[0,7,T.CLOUD],[14,22,T.CLOUD],[32,41,T.CLOUD],[47,56,T.CLOUD],[62,70,T.CLOUD]]);
+
+  // Row 13-14: Mid shelves (solid, 3 tiles above cloud row 16)
+  rows[13] = buildRow(W, [[4,12,T.SHELF],[20,29,T.SHELF],[37,46,T.SHELF],[53,62,T.SHELF],[67,76,T.SHELF]]);
+  rows[14] = buildRow(W, [[4,12,T.DIRT],[20,29,T.DIRT],[37,46,T.DIRT],[53,62,T.DIRT],[67,76,T.DIRT]]);
+
+  // Row 10: High cloud cushions (one-way, 3 tiles above row 13)
+  rows[10] = buildRow(W, [[8,16,T.CLOUD],[26,35,T.CLOUD],[44,53,T.CLOUD],[61,70,T.CLOUD]]);
+
+  // Row 7-8: Top shelves (solid, 3 tiles above row 10)
+  rows[7] = buildRow(W, [[14,22,T.SHELF],[37,47,T.SHELF],[58,67,T.SHELF]]);
+  rows[8] = buildRow(W, [[14,22,T.DIRT],[37,47,T.DIRT],[58,67,T.DIRT]]);
+
+  // Treat spot visual markers (row 21, one tile above floor surface)
+  rows[21][4] = T.VEGE;
+  rows[21][16] = T.VEGE;
+  rows[21][50] = T.VEGE;
+  rows[21][69] = T.VEGE;
+
+  // Cat door exit (row 21, far right)
   rows[21][77] = T.DOOR;
 
   return {
@@ -363,31 +370,40 @@ function createLevel1() {
     bgColor: '#e8d8c0', bgColor2: '#d0c0a8',
     spawnX: 2, spawnY: 20,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 14, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 25, ty: 21, color: 'blue' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 35, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.NINJI,  tx: 42, ty: 21 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 50, ty: 21, color: 'pink' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 60, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.NINJI,  tx: 68, ty: 17 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 72, ty: 21, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 13, ty: 21, color: 'red' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 24, ty: 21, color: 'blue' },
+      { type: ENEMY_TYPES.NINJI,  tx: 36, ty: 18 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 47, ty: 21, color: 'pink' },
+      { type: ENEMY_TYPES.SNIFIT, tx: 57, ty: 21 },
+      { type: ENEMY_TYPES.NINJI,  tx: 66, ty: 15 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 74, ty: 21, color: 'green' },
     ],
     vegetables: [
-      { tx: 5, ty: 13, type: 'yarn' },
-      { tx: 18, ty: 13, type: 'mouse' },
-      { tx: 31, ty: 13, type: 'feather' },
-      { tx: 47, ty: 13, type: 'yarn' },
-      { tx: 63, ty: 13, type: 'mouse' },
-      { tx: 9, ty: 21, type: 'yarn' },
-      { tx: 20, ty: 21, type: 'feather' },
-      { tx: 45, ty: 21, type: 'yarn' },
-      { tx: 58, ty: 21, type: 'mouse' },
+      // Floor level (ty=22 so player can grab while standing on floor)
+      { tx: 4,  ty: 22, type: 'yarn' },
+      { tx: 16, ty: 22, type: 'mouse' },
+      { tx: 50, ty: 22, type: 'feather' },
+      { tx: 69, ty: 22, type: 'yarn' },
+      // Lower shelf level (ty=19)
+      { tx: 3,  ty: 19, type: 'mouse' },
+      { tx: 15, ty: 19, type: 'yarn' },
+      { tx: 33, ty: 19, type: 'feather' },
+      { tx: 47, ty: 19, type: 'yarn' },
+      { tx: 62, ty: 19, type: 'mouse' },
+      // Mid shelf level (ty=13)
+      { tx: 7,  ty: 13, type: 'feather' },
+      { tx: 24, ty: 13, type: 'yarn' },
+      { tx: 42, ty: 13, type: 'mouse' },
     ],
     coins: [
-      {tx:6,ty:9},{tx:7,ty:9},{tx:8,ty:9},
-      {tx:19,ty:9},{tx:20,ty:9},{tx:21,ty:9},
-      {tx:36,ty:9},{tx:37,ty:9},{tx:38,ty:9},
-      {tx:46,ty:9},{tx:47,ty:9},{tx:48,ty:9},
+      // Coins floating above lower shelves (invites jumping up)
+      {tx:4,ty:17},{tx:5,ty:17},{tx:6,ty:17},
+      {tx:14,ty:17},{tx:15,ty:17},{tx:16,ty:17},
+      {tx:32,ty:17},{tx:33,ty:17},
+      {tx:46,ty:17},{tx:47,ty:17},
+      // Coins above high clouds
+      {tx:28,ty:8},{tx:29,ty:8},
+      {tx:47,ty:8},{tx:48,ty:8},
     ]
   };
 }
@@ -397,76 +413,86 @@ function createLevel1() {
 // ===========================
 function createLevel2() {
   const W = 90;
+  const H = 25;
   const rows = [];
-  for (let r = 0; r < 4; r++) rows.push(makeRow(W));
-  // Upper cushion cloud platforms (lowered from row 6 to row 4)
-  rows.push(buildRow(W, [[8,11,T.CLOUD],[20,24,T.CLOUD],[35,39,T.CLOUD],[50,54,T.CLOUD],[65,69,T.CLOUD],[80,84,T.CLOUD]]));
-  rows.push(makeRow(W));
-  // High counter/shelf platforms (lowered from row 8 to row 6)
-  rows.push(buildRow(W, [[2,5,T.SAND],[10,14,T.SAND],[18,22,T.SAND],[28,33,T.SAND],[40,46,T.SAND],[52,59,T.SAND],[65,73,T.SAND],[78,85,T.SAND]]));
-  rows.push(makeRow(W));
-  // Mid-level platforms (lowered from row 11 to row 8, with more platforms added)
-  rows.push(buildRow(W, [[0,6,T.SAND],[10,16,T.SAND],[22,28,T.SAND],[34,40,T.SAND],[46,52,T.SAND],[58,64,T.SAND],[70,76,T.SAND],[82,89,T.SAND]]));
-  rows.push(makeRow(W));
-  // Lower platforms (lowered from row 14 to row 10, with more coverage)
-  rows.push(buildRow(W, [[0,8,T.SAND],[12,20,T.SAND],[26,34,T.SAND],[40,48,T.SAND],[54,62,T.SAND],[68,76,T.SAND],[82,89,T.SAND]]));
-  rows.push(makeRow(W));
-  // Additional stepping platforms for easier progression
-  rows.push(buildRow(W, [[4,10,T.CLOUD],[18,24,T.CLOUD],[32,38,T.CLOUD],[46,52,T.CLOUD],[60,66,T.CLOUD],[74,80,T.CLOUD]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  // Cat tower posts (moved down slightly)
-  rows.push(buildRow(W, [[15,15,T.PIPE_TL],[16,16,T.PIPE_TR],[45,45,T.PIPE_TL],[46,46,T.PIPE_TR],[75,75,T.PIPE_TL],[76,76,T.PIPE_TR]]));
-  rows.push(buildRow(W, [[15,15,T.PIPE_BL],[16,16,T.PIPE_BR],[45,45,T.PIPE_BL],[46,46,T.PIPE_BR],[75,75,T.PIPE_BL],[76,76,T.PIPE_BR]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W)); rows.push(makeRow(W));
-  // Kitchen tile floor
-  rows.push(buildRow(W, [[0,89,T.BRICK]]));
-  rows.push(buildRow(W, [[0,89,T.DIRT]]));
-  rows.push(buildRow(W, [[0,89,T.DIRT]]));
-  rows.push(buildRow(W, [[0,89,T.DIRT]]));
+  for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  // Treat spots (adjusted to new row positions)
-  rows[6] = buildRow(W, [[3,3,T.VEGE],[12,12,T.VEGE],[20,20,T.VEGE],[30,30,T.VEGE],[42,42,T.VEGE],[55,55,T.VEGE],[68,68,T.VEGE]]);
+  // Row 22-24: Kitchen tile floor (with pits)
+  rows[22] = buildRow(W, [[0,9,T.BRICK],[13,29,T.BRICK],[33,50,T.BRICK],[54,70,T.BRICK],[74,89,T.BRICK]]);
+  rows[23] = buildRow(W, [[0,9,T.DIRT],[13,29,T.DIRT],[33,50,T.DIRT],[54,70,T.DIRT],[74,89,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,9,T.DIRT],[13,29,T.DIRT],[33,50,T.DIRT],[54,70,T.DIRT],[74,89,T.DIRT]]);
 
-  while (rows.length < 25) rows.push(makeRow(W));
+  // Row 19-20: Counter platforms (solid, 3 tiles above floor)
+  rows[19] = buildRow(W, [[1,9,T.SAND],[14,22,T.SAND],[32,41,T.SAND],[46,55,T.SAND],[60,69,T.SAND],[75,89,T.SAND]]);
+  rows[20] = buildRow(W, [[1,9,T.DIRT],[14,22,T.DIRT],[32,41,T.DIRT],[46,55,T.DIRT],[60,69,T.DIRT],[75,89,T.DIRT]]);
 
-  rows[20][87] = T.DOOR;
+  // Row 16: Cloud stepping platforms (one-way, 3 tiles above row 19)
+  rows[16] = buildRow(W, [[0,8,T.CLOUD],[16,24,T.CLOUD],[34,43,T.CLOUD],[49,58,T.CLOUD],[65,74,T.CLOUD]]);
+
+  // Row 13-14: Upper counters/cabinets (solid, 3 tiles above row 16)
+  rows[13] = buildRow(W, [[4,13,T.SAND],[21,30,T.SAND],[40,49,T.SAND],[56,65,T.SAND],[72,83,T.SAND]]);
+  rows[14] = buildRow(W, [[4,13,T.DIRT],[21,30,T.DIRT],[40,49,T.DIRT],[56,65,T.DIRT],[72,83,T.DIRT]]);
+
+  // Row 10: High cloud platforms (one-way, 3 tiles above row 13)
+  rows[10] = buildRow(W, [[9,18,T.CLOUD],[29,38,T.CLOUD],[50,59,T.CLOUD],[67,76,T.CLOUD]]);
+
+  // Row 7-8: Top cabinet shelves (solid, 3 tiles above row 10)
+  rows[7] = buildRow(W, [[15,24,T.SAND],[42,52,T.SAND],[63,73,T.SAND]]);
+  rows[8] = buildRow(W, [[15,24,T.DIRT],[42,52,T.DIRT],[63,73,T.DIRT]]);
+
+  // Cat tower posts (decoration/platforms)
+  rows[17] = buildRow(W, [[24,24,T.PIPE_TL],[25,25,T.PIPE_TR],[54,54,T.PIPE_TL],[55,55,T.PIPE_TR]]);
+  rows[18] = buildRow(W, [[24,24,T.PIPE_BL],[25,25,T.PIPE_BR],[54,54,T.PIPE_BL],[55,55,T.PIPE_BR]]);
+
+  // Treat spot visual markers (row above floor)
+  rows[21][5]  = T.VEGE;
+  rows[21][20] = T.VEGE;
+  rows[21][58] = T.VEGE;
+  rows[21][77] = T.VEGE;
+
+  rows[21][87] = T.DOOR;
 
   return {
     tiles: rows,
     name: 'Kitchen',
     theme: 'kitchen',
     bgColor: '#f0ece4', bgColor2: '#e0d8c8',
-    spawnX: 1, spawnY: 18,
+    spawnX: 1, spawnY: 20,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 10, ty: 19, color: 'red' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 18, ty: 19 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 28, ty: 19, color: 'blue' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 38, ty: 19, color: 'red' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 48, ty: 19 },
-      { type: ENEMY_TYPES.NINJI,   tx: 56, ty: 19 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 65, ty: 19, color: 'pink' },
-      { type: ENEMY_TYPES.SNIFIT,  tx: 73, ty: 19 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 82, ty: 19, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 14, ty: 21, color: 'red' },
+      { type: ENEMY_TYPES.SNIFIT,  tx: 23, ty: 21 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 34, ty: 21, color: 'blue' },
+      { type: ENEMY_TYPES.NINJI,   tx: 46, ty: 18 },
+      { type: ENEMY_TYPES.SNIFIT,  tx: 58, ty: 21 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 67, ty: 21, color: 'pink' },
+      { type: ENEMY_TYPES.NINJI,   tx: 77, ty: 15 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 84, ty: 21, color: 'green' },
     ],
     vegetables: [
-      { tx: 3, ty: 6, type: 'yarn' },
-      { tx: 12, ty: 6, type: 'mouse' },
-      { tx: 20, ty: 6, type: 'feather' },
-      { tx: 30, ty: 6, type: 'yarn' },
-      { tx: 42, ty: 6, type: 'mouse' },
-      { tx: 55, ty: 6, type: 'yarn' },
-      { tx: 68, ty: 6, type: 'feather' },
-      { tx: 5, ty: 19, type: 'yarn' },
-      { tx: 24, ty: 19, type: 'mouse' },
-      { tx: 50, ty: 19, type: 'feather' },
-      { tx: 70, ty: 19, type: 'yarn' },
+      // Floor level (ty=22)
+      { tx: 5,  ty: 22, type: 'yarn' },
+      { tx: 20, ty: 22, type: 'mouse' },
+      { tx: 58, ty: 22, type: 'feather' },
+      { tx: 77, ty: 22, type: 'yarn' },
+      // Counter level (ty=19)
+      { tx: 4,  ty: 19, type: 'mouse' },
+      { tx: 17, ty: 19, type: 'yarn' },
+      { tx: 35, ty: 19, type: 'feather' },
+      { tx: 49, ty: 19, type: 'yarn' },
+      { tx: 63, ty: 19, type: 'mouse' },
+      { tx: 78, ty: 19, type: 'feather' },
+      // Upper cabinet level (ty=13)
+      { tx: 7,  ty: 13, type: 'feather' },
+      { tx: 25, ty: 13, type: 'yarn' },
+      { tx: 44, ty: 13, type: 'mouse' },
     ],
     coins: [
-      {tx:9,ty:4},{tx:10,ty:4},
-      {tx:22,ty:4},{tx:23,ty:4},
-      {tx:37,ty:4},{tx:38,ty:4},
-      {tx:52,ty:4},{tx:53,ty:4},
-      {tx:67,ty:4},{tx:68,ty:4},
+      {tx:4,ty:17},{tx:5,ty:17},{tx:6,ty:17},
+      {tx:16,ty:17},{tx:17,ty:17},
+      {tx:35,ty:17},{tx:36,ty:17},
+      {tx:48,ty:17},{tx:49,ty:17},
+      {tx:62,ty:11},{tx:63,ty:11},
+      {tx:34,ty:11},{tx:35,ty:11},
     ]
   };
 }
@@ -476,61 +502,78 @@ function createLevel2() {
 // ===========================
 function createLevel3() {
   const W = 70;
+  const H = 25;
   const rows = [];
-  for (let r = 0; r < 5; r++) rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,5,T.CLOUD],[10,15,T.CLOUD],[20,26,T.CLOUD],[32,38,T.CLOUD],[45,52,T.CLOUD],[58,64,T.CLOUD]]));
-  rows.push(makeRow(W));
-  rows.push(buildRow(W, [[1,6,T.CLOUD],[12,17,T.CLOUD],[22,28,T.CLOUD],[34,41,T.CLOUD],[47,53,T.CLOUD],[58,65,T.CLOUD]]));
-  rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,3,T.CLOUD],[7,12,T.CLOUD],[16,22,T.CLOUD],[26,33,T.CLOUD],[38,46,T.CLOUD],[50,58,T.CLOUD],[62,69,T.CLOUD]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,8,T.CLOUD],[12,20,T.CLOUD],[24,32,T.CLOUD],[36,44,T.CLOUD],[48,56,T.CLOUD],[60,69,T.CLOUD]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,14,T.CLOUD],[18,34,T.CLOUD],[38,54,T.CLOUD],[58,69,T.CLOUD]]));
-  rows.push(makeRow(W));
-  // Ground (grass/dirt yard)
-  rows.push(buildRow(W, [[0,69,T.GRASS]]));
-  rows.push(buildRow(W, [[0,69,T.GRASS]]));
-  rows.push(buildRow(W, [[0,69,T.DIRT]]));
-  rows.push(buildRow(W, [[0,69,T.DIRT]]));
-  rows.push(buildRow(W, [[0,69,T.DIRT]]));
-  rows.push(buildRow(W, [[0,69,T.DIRT]]));
+  for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  // Treat spots
-  rows[9] = buildRow(W, [[2,2,T.VEGE],[14,14,T.VEGE],[28,28,T.VEGE],[42,42,T.VEGE],[54,54,T.VEGE]]);
+  // Row 22-24: Grass ground (with a couple pits)
+  rows[22] = buildRow(W, [[0,8,T.GRASS],[12,28,T.GRASS],[32,48,T.GRASS],[52,62,T.GRASS],[65,69,T.GRASS]]);
+  rows[23] = buildRow(W, [[0,8,T.DIRT],[12,28,T.DIRT],[32,48,T.DIRT],[52,62,T.DIRT],[65,69,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,8,T.DIRT],[12,28,T.DIRT],[32,48,T.DIRT],[52,62,T.DIRT],[65,69,T.DIRT]]);
 
-  while (rows.length < 25) rows.push(makeRow(W));
+  // Row 19-20: Low stumps/rocks (solid, 3 tiles above ground)
+  rows[19] = buildRow(W, [[1,8,T.GRASS],[14,21,T.GRASS],[31,39,T.GRASS],[44,52,T.GRASS],[56,63,T.GRASS]]);
+  rows[20] = buildRow(W, [[1,8,T.DIRT],[14,21,T.DIRT],[31,39,T.DIRT],[44,52,T.DIRT],[56,63,T.DIRT]]);
 
-  rows[18][67] = T.DOOR;
+  // Row 16: Cloud platforms (one-way - tree branches/clouds, 3 tiles above row 19)
+  rows[16] = buildRow(W, [[0,7,T.CLOUD],[13,21,T.CLOUD],[30,39,T.CLOUD],[45,54,T.CLOUD],[59,69,T.CLOUD]]);
+
+  // Row 13-14: Higher rocks/tree trunks (solid, 3 tiles above row 16)
+  rows[13] = buildRow(W, [[4,12,T.GRASS],[20,28,T.GRASS],[36,45,T.GRASS],[51,60,T.GRASS]]);
+  rows[14] = buildRow(W, [[4,12,T.DIRT],[20,28,T.DIRT],[36,45,T.DIRT],[51,60,T.DIRT]]);
+
+  // Row 10: High cloud platforms (one-way, 3 tiles above row 13)
+  rows[10] = buildRow(W, [[8,16,T.CLOUD],[26,35,T.CLOUD],[44,53,T.CLOUD],[58,69,T.CLOUD]]);
+
+  // Row 7-8: Tree top platforms (solid, sparse)
+  rows[7] = buildRow(W, [[14,22,T.GRASS],[37,47,T.GRASS],[55,65,T.GRASS]]);
+  rows[8] = buildRow(W, [[14,22,T.DIRT],[37,47,T.DIRT],[55,65,T.DIRT]]);
+
+  // Treat spot visual markers
+  rows[21][5]  = T.VEGE;
+  rows[21][20] = T.VEGE;
+  rows[21][47] = T.VEGE;
+  rows[21][62] = T.VEGE;
+
+  // No door - level exits via boss defeat
 
   return {
     tiles: rows,
     name: 'Backyard',
     theme: 'backyard',
     bgColor: '#6ab0e8', bgColor2: '#90d0f0',
-    spawnX: 2, spawnY: 17,
+    spawnX: 2, spawnY: 20,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 8, ty: 22, color: 'blue' },
-      { type: ENEMY_TYPES.NINJI,  tx: 15, ty: 22 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 22, ty: 22, color: 'pink' },
-      { type: ENEMY_TYPES.SNIFIT, tx: 30, ty: 22 },
-      { type: ENEMY_TYPES.BIRDO,  tx: 48, ty: 20 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 13, ty: 21, color: 'blue' },
+      { type: ENEMY_TYPES.NINJI,  tx: 22, ty: 21 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 33, ty: 21, color: 'pink' },
+      { type: ENEMY_TYPES.SNIFIT, tx: 44, ty: 21 },
+      { type: ENEMY_TYPES.BIRDO,  tx: 55, ty: 20 },
     ],
     vegetables: [
-      { tx: 2, ty: 9, type: 'yarn' },
-      { tx: 14, ty: 9, type: 'mouse' },
-      { tx: 28, ty: 9, type: 'feather' },
-      { tx: 42, ty: 9, type: 'yarn' },
-      { tx: 54, ty: 9, type: 'mouse' },
-      { tx: 5, ty: 22, type: 'yarn' },
-      { tx: 18, ty: 22, type: 'feather' },
-      { tx: 35, ty: 22, type: 'mouse' },
+      // Ground level (ty=22)
+      { tx: 5,  ty: 22, type: 'yarn' },
+      { tx: 20, ty: 22, type: 'mouse' },
+      { tx: 47, ty: 22, type: 'feather' },
+      { tx: 62, ty: 22, type: 'yarn' },
+      // Low stump level (ty=19)
+      { tx: 4,  ty: 19, type: 'mouse' },
+      { tx: 17, ty: 19, type: 'yarn' },
+      { tx: 34, ty: 19, type: 'feather' },
+      { tx: 48, ty: 19, type: 'yarn' },
+      { tx: 59, ty: 19, type: 'mouse' },
+      // Higher rock level (ty=13)
+      { tx: 7,  ty: 13, type: 'feather' },
+      { tx: 24, ty: 13, type: 'yarn' },
+      { tx: 40, ty: 13, type: 'mouse' },
     ],
     coins: [
-      {tx:4,ty:6},{tx:5,ty:6},
-      {tx:15,ty:6},{tx:16,ty:6},
-      {tx:27,ty:6},{tx:28,ty:6},
-      {tx:40,ty:6},{tx:41,ty:6},
+      {tx:4,ty:17},{tx:5,ty:17},{tx:6,ty:17},
+      {tx:16,ty:17},{tx:17,ty:17},
+      {tx:33,ty:17},{tx:34,ty:17},
+      {tx:46,ty:17},{tx:47,ty:17},
+      {tx:28,ty:8},{tx:29,ty:8},
+      {tx:45,ty:8},{tx:46,ty:8},
     ]
   };
 }
@@ -540,61 +583,76 @@ function createLevel3() {
 // ===========================
 function createLevel4() {
   const W = 60;
+  const H = 25;
   const rows = [];
-  for (let r = 0; r < 4; r++) rows.push(makeRow(W));
-  // Examination table platforms
-  rows.push(buildRow(W, [[2,8,T.BRICK],[14,20,T.BRICK],[26,32,T.BRICK],[38,44,T.BRICK],[50,57,T.BRICK]]));
-  rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,5,T.BRICK],[10,16,T.BRICK],[22,28,T.BRICK],[34,40,T.BRICK],[46,58,T.BRICK]]));
-  rows.push(makeRow(W));
-  rows.push(buildRow(W, [[4,10,T.BRICK],[16,22,T.BRICK],[28,35,T.BRICK],[40,47,T.BRICK],[52,59,T.BRICK]]));
-  rows.push(makeRow(W)); rows.push(makeRow(W));
-  rows.push(buildRow(W, [[0,7,T.BRICK],[12,20,T.BRICK],[24,32,T.BRICK],[36,44,T.BRICK],[48,59,T.BRICK]]));
-  rows.push(makeRow(W));
-  // Main tile floor
-  rows.push(buildRow(W, [[0,59,T.BRICK]]));
-  rows.push(buildRow(W, [[0,59,T.DIRT]]));
-  rows.push(buildRow(W, [[0,59,T.DIRT]]));
-  rows.push(buildRow(W, [[0,59,T.DIRT]]));
-  rows.push(buildRow(W, [[0,59,T.DIRT]]));
-  rows.push(buildRow(W, [[0,59,T.DIRT]]));
+  for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  rows[11] = buildRow(W, [[3,3,T.VEGE],[15,15,T.VEGE],[27,27,T.VEGE],[41,41,T.VEGE],[53,53,T.VEGE]]);
+  // Row 22-24: Tile floor (with a pit near the start to add tension)
+  rows[22] = buildRow(W, [[0,7,T.BRICK],[11,27,T.BRICK],[30,46,T.BRICK],[49,59,T.BRICK]]);
+  rows[23] = buildRow(W, [[0,7,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,59,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,7,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,59,T.DIRT]]);
 
-  while (rows.length < 25) rows.push(makeRow(W));
+  // Row 19-20: Exam tables (solid, 3 tiles above floor)
+  rows[19] = buildRow(W, [[1,8,T.BRICK],[13,21,T.BRICK],[29,38,T.BRICK],[43,51,T.BRICK],[55,59,T.BRICK]]);
+  rows[20] = buildRow(W, [[1,8,T.DIRT],[13,21,T.DIRT],[29,38,T.DIRT],[43,51,T.DIRT],[55,59,T.DIRT]]);
 
-  rows[13][1] = T.DOOR;
+  // Row 16: Cloud platforms (one-way, 3 tiles above row 19)
+  rows[16] = buildRow(W, [[0,7,T.CLOUD],[14,22,T.CLOUD],[31,39,T.CLOUD],[46,54,T.CLOUD]]);
+
+  // Row 13-14: Cabinet shelves (solid, 3 tiles above row 16)
+  rows[13] = buildRow(W, [[4,12,T.BRICK],[20,29,T.BRICK],[36,45,T.BRICK],[52,59,T.BRICK]]);
+  rows[14] = buildRow(W, [[4,12,T.DIRT],[20,29,T.DIRT],[36,45,T.DIRT],[52,59,T.DIRT]]);
+
+  // Row 10: High cloud platforms (one-way, 3 tiles above row 13)
+  rows[10] = buildRow(W, [[8,16,T.CLOUD],[26,35,T.CLOUD],[44,53,T.CLOUD]]);
+
+  // Row 7-8: Top cabinets (solid, sparse)
+  rows[7] = buildRow(W, [[14,22,T.BRICK],[37,47,T.BRICK]]);
+  rows[8] = buildRow(W, [[14,22,T.DIRT],[37,47,T.DIRT]]);
+
+  // Treat spot visual markers (row 21, above floor)
+  rows[21][4]  = T.VEGE;
+  rows[21][18] = T.VEGE;
+  rows[21][42] = T.VEGE;
+
+  // No door tile needed - level 4 exits via boss (Wart) defeat
 
   return {
     tiles: rows,
     name: "Vet's Office",
     theme: 'vetoffice',
     bgColor: '#e8f0f8', bgColor2: '#d0e0f0',
-    spawnX: 2, spawnY: 19,
+    spawnX: 2, spawnY: 20,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 6,  ty: 19, color: 'red' },
-      { type: ENEMY_TYPES.NINJI,  tx: 12, ty: 19 },
-      { type: ENEMY_TYPES.SNIFIT, tx: 18, ty: 19 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 24, ty: 19, color: 'blue' },
-      { type: ENEMY_TYPES.NINJI,  tx: 30, ty: 19 },
-      { type: ENEMY_TYPES.SNIFIT, tx: 36, ty: 19 },
-      { type: ENEMY_TYPES.WART,   tx: 44, ty: 19 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 12, ty: 21, color: 'red' },
+      { type: ENEMY_TYPES.NINJI,  tx: 22, ty: 21 },
+      { type: ENEMY_TYPES.SNIFIT, tx: 31, ty: 21 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 40, ty: 21, color: 'blue' },
+      { type: ENEMY_TYPES.NINJI,  tx: 51, ty: 15 },
+      { type: ENEMY_TYPES.WART,   tx: 50, ty: 21 },
     ],
     vegetables: [
-      { tx: 3, ty: 11, type: 'yarn' },
-      { tx: 15, ty: 11, type: 'mouse' },
-      { tx: 27, ty: 11, type: 'feather' },
-      { tx: 41, ty: 11, type: 'yarn' },
-      { tx: 53, ty: 11, type: 'mouse' },
-      { tx: 5, ty: 19, type: 'yarn' },
-      { tx: 16, ty: 19, type: 'feather' },
-      { tx: 30, ty: 19, type: 'mouse' },
+      // Floor level (ty=22)
+      { tx: 4,  ty: 22, type: 'yarn' },
+      { tx: 18, ty: 22, type: 'mouse' },
+      { tx: 42, ty: 22, type: 'feather' },
+      // Exam table level (ty=19)
+      { tx: 4,  ty: 19, type: 'mouse' },
+      { tx: 16, ty: 19, type: 'yarn' },
+      { tx: 32, ty: 19, type: 'feather' },
+      { tx: 47, ty: 19, type: 'yarn' },
+      { tx: 57, ty: 19, type: 'mouse' },
+      // Cabinet shelf level (ty=13)
+      { tx: 7,  ty: 13, type: 'feather' },
+      { tx: 24, ty: 13, type: 'yarn' },
+      { tx: 40, ty: 13, type: 'mouse' },
     ],
     coins: [
-      {tx:5,ty:3},{tx:6,ty:3},
-      {tx:18,ty:3},{tx:19,ty:3},
-      {tx:30,ty:3},{tx:31,ty:3},
-      {tx:44,ty:3},{tx:45,ty:3},
+      {tx:3,ty:17},{tx:4,ty:17},{tx:5,ty:17},
+      {tx:15,ty:17},{tx:16,ty:17},
+      {tx:31,ty:17},{tx:32,ty:17},
+      {tx:45,ty:17},{tx:46,ty:17},
+      {tx:28,ty:8},{tx:29,ty:8},
     ]
   };
 }

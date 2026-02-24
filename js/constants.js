@@ -54,7 +54,7 @@ const CHARACTERS = {
     hatColor: '#222',      // black nose mark
     overallColor: '#e8dcc8',
     speed: 4.3,            // Slightly increased for speedier feel
-    jumpPower: -10.5,      // Increased from -9.8 for more viable jumps
+    jumpPower: -11.5,      // Increased for reliable 3-tile jumps
     jumpHold: 0.38,        // Slightly increased for better control
     liftSpeed: 1.35,
     floatAbility: false,
@@ -105,6 +105,9 @@ const T = {
 const SOLID_TILES = new Set([T.GROUND, T.BRICK, T.DIRT, T.GRASS, T.SAND,
   T.PIPE_TL, T.PIPE_TR, T.PIPE_BL, T.PIPE_BR, T.SOLID_INVISIBLE,
   T.CARPET, T.SHELF]);
+
+// One-way platforms: can jump up through from below, land on from above
+const ONE_WAY_TILES = new Set([T.CLOUD]);
 
 // Score values
 const SCORE = {

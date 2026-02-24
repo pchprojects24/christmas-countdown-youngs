@@ -518,16 +518,17 @@ class Game {
     ctx.save();
     ctx.globalAlpha = alpha * 0.75;
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(6, 6, 200, 70);
+    ctx.fillRect(6, 6, 230, 82);
     ctx.fillStyle = '#ffe04b';
     ctx.font = '10px Courier New';
     ctx.textAlign = 'left';
     ctx.fillText('CONTROLS:', 12, 22);
     ctx.fillStyle = '#fff';
-    ctx.fillText('← → : Move', 12, 36);
-    ctx.fillText('Space/X : Jump', 12, 48);
-    ctx.fillText('Shift/Z/B : Grab / Throw Treats', 12, 60);
-    ctx.fillText('↓ : Crouch', 12, 72);
+    ctx.fillText('← → : Move   Space/X : Jump', 12, 36);
+    ctx.fillText('Shift/Z/B : Grab item / Throw at enemy', 12, 48);
+    ctx.fillText('↓ : Crouch   Stomp enemy to stun first!', 12, 60);
+    ctx.fillStyle = '#ffcc66';
+    ctx.fillText('Grab toys from ground → throw at enemies!', 12, 74);
     ctx.restore();
   }
 
