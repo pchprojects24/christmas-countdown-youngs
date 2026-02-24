@@ -498,6 +498,7 @@ class Birdo extends Enemy {
   takeBossHit(game) {
     this.hp--;
     Audio.bossHit();
+    game.spawnParticles(this.centerX, this.centerY, '#ffe04b', 14);
     this.angryTimer = 30;
     if (this.hp <= 3 && this.phase === 1) {
       this.phase = 2;
@@ -558,25 +559,26 @@ class Birdo extends Enemy {
           player.takeDamage(game);
         }
       }
-      if (player.carrying && player.carrying === egg && !egg.dead) {
-        if (egg.thrown && egg.thrownBy === player) {
-          if (egg.x < this.right && egg.x+egg.w > this.left &&
-              egg.y < this.bottom && egg.y+egg.h > this.top) {
-            egg.dead = true;
-            this.takeBossHit(game);
-          }
-        }
-      }
     }
     this.eggs = this.eggs.filter(e => !e.dead);
 
-    if (player.carrying && player.carrying.thrown && player.carrying.thrownBy === player) {
-      const item = player.carrying;
-      if (item.x < this.right && item.x+item.w > this.left &&
-          item.y < this.bottom && item.y+item.h > this.top) {
-        item.dead = true;
-        player.carrying = null;
+    // Player-thrown treats or enemies damage the boss (SMB2 style)
+    for (const v of game.vegetables) {
+      if (!v.thrown || v.dead) continue;
+      if (v.x < this.right && v.x+v.w > this.left &&
+          v.y < this.bottom && v.y+v.h > this.top) {
+        v.dead = true;
         this.takeBossHit(game);
+        break;
+      }
+    }
+    for (const e of game.enemies) {
+      if (e === this || e.dead || !e.thrown || e.carried) continue;
+      if (e.x < this.right && e.x+e.w > this.left &&
+          e.y < this.bottom && e.y+e.h > this.top) {
+        e.dead = true;
+        this.takeBossHit(game);
+        break;
       }
     }
 
