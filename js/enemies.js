@@ -115,10 +115,16 @@ class ShyGuy extends Enemy {
 
     // Check stomp by player
     if (!this.stunned && player.isAlive && this.overlaps(player)) {
-      if (player.vy > 0 && player.bottom <= this.y + 10) {
+      if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
-        player.vy = -7;
+        // Dynamic stomp bounce - higher if holding jump
+        const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
+        player.vy = jumpHeld ? -10 : -6;
+        player.isJumping = jumpHeld;
+        player.jumpHeld = 0;
+        player.squashY = -3; // stretch on stomp
         game.addScore(SCORE.ENEMY_STOMP, this.centerX, this.y, game.camX);
+        game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
       } else {
         player.takeDamage(game);
@@ -280,10 +286,15 @@ class Ninji extends Enemy {
     }
 
     if (player.isAlive && this.overlaps(player)) {
-      if (player.vy > 0 && player.bottom <= this.y + 10) {
+      if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
-        player.vy = -7;
+        const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
+        player.vy = jumpHeld ? -10 : -6;
+        player.isJumping = jumpHeld;
+        player.jumpHeld = 0;
+        player.squashY = -3;
         game.addScore(this.scoreValue, this.centerX, this.y, game.camX);
+        game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
       } else {
         player.takeDamage(game);
@@ -423,10 +434,15 @@ class Snifit extends Enemy {
     this.projectiles = this.projectiles.filter(p => !p.dead);
 
     if (player.isAlive && this.overlaps(player) && !this.stunned) {
-      if (player.vy > 0 && player.bottom <= this.y + 10) {
+      if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
-        player.vy = -7;
+        const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
+        player.vy = jumpHeld ? -10 : -6;
+        player.isJumping = jumpHeld;
+        player.jumpHeld = 0;
+        player.squashY = -3;
         game.addScore(this.scoreValue, this.centerX, this.y, game.camX);
+        game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
       } else {
         player.takeDamage(game);

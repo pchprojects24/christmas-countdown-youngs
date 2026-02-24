@@ -5,6 +5,18 @@ const TERMINAL_VEL = 14;
 const CANVAS_W = 800;
 const CANVAS_H = 800;  // Match full level height (25 tiles * 32px) so the player spawns on-screen
 
+// Physics tuning
+const COYOTE_FRAMES = 6;       // frames after leaving ground where jump still works
+const JUMP_BUFFER_FRAMES = 8;  // frames before landing where jump input is remembered
+const APEX_THRESHOLD = 2.0;    // vy threshold for apex hang (reduced gravity near peak)
+const APEX_GRAVITY_MULT = 0.4; // gravity multiplier during apex hang
+const GROUND_ACCEL = 0.65;     // horizontal acceleration on ground
+const GROUND_DECEL = 0.78;     // horizontal deceleration on ground (friction)
+const AIR_ACCEL = 0.45;        // horizontal acceleration in air
+const AIR_DECEL = 0.92;        // horizontal deceleration in air (less friction = more slide)
+const CAM_LOOKAHEAD = 60;      // pixels of camera lookahead in movement direction
+const CAM_LOOKAHEAD_SPEED = 0.04; // how fast the lookahead catches up
+
 // Character definitions
 const CHARACTERS = {
   mario: {
