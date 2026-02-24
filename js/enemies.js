@@ -117,10 +117,10 @@ class ShyGuy extends Enemy {
       if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
         const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
-        player.vy = jumpHeld ? -10 : -6;
+        player.vy = jumpHeld ? -11 : -7;  // Increased bounce power for better feel
         player.isJumping = jumpHeld;
         player.jumpHeld = 0;
-        player.squashY = -3;
+        player.squashY = -4;  // Increased visual feedback
         game.addScore(SCORE.ENEMY_STOMP, this.centerX, this.y, game.camX);
         game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
@@ -263,10 +263,10 @@ class Ninji extends Enemy {
       if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
         const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
-        player.vy = jumpHeld ? -10 : -6;
+        player.vy = jumpHeld ? -11 : -7;  // Increased bounce power for better feel
         player.isJumping = jumpHeld;
         player.jumpHeld = 0;
-        player.squashY = -3;
+        player.squashY = -4;  // Increased visual feedback
         game.addScore(this.scoreValue, this.centerX, this.y, game.camX);
         game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
@@ -391,10 +391,10 @@ class Snifit extends Enemy {
       if (player.vy > 0 && player.bottom <= this.y + 12) {
         this.stun(200);
         const jumpHeld = KEYS['jump'] || KEYS[' '] || KEYS['x'];
-        player.vy = jumpHeld ? -10 : -6;
+        player.vy = jumpHeld ? -11 : -7;  // Increased bounce power for better feel
         player.isJumping = jumpHeld;
         player.jumpHeld = 0;
-        player.squashY = -3;
+        player.squashY = -4;  // Increased visual feedback
         game.addScore(this.scoreValue, this.centerX, this.y, game.camX);
         game.spawnParticles(this.centerX, this.top, '#ffe04b', 6);
         Audio.enemyDie();
