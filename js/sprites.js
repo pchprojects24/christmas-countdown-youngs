@@ -9,32 +9,27 @@ function px(ctx, color, x, y, w = 1, h = 1, scale = 1) {
 }
 
 // ---- MARICE: Human woman with dark hair, white coat, blue scarf ----
-// Based on photo: dark-haired woman with white coat and blue scarf
+// Female character: dark hair, light coat, plaid scarf (reference)
 function drawMariceSprite(ctx, frame = 0, dir = 1, scale = 2) {
   const s = scale;
-  // Hair (dark brown, flowing)
-  px(ctx, '#3a2010', 3,0, 10,3, s);
-  px(ctx, '#4a2a14', 5,0, 6,1, s); // highlight
+  // Hair (dark brown/black, flowing - reads clearly as female)
+  px(ctx, '#2a1810', 3,0, 10,3, s);
+  px(ctx, '#3a2010', 5,0, 6,1, s); // highlight
   // Hair sides
-  px(ctx, '#3a2010', 2,1, 1,4, s);
-  px(ctx, '#3a2010', 13,1, 1,4, s);
+  px(ctx, '#2a1810', 2,1, 1,4, s);
+  px(ctx, '#2a1810', 13,1, 1,4, s);
   // Hair flowing down past shoulders
-  px(ctx, '#3a2010', 1,3, 2,5, s);
-  px(ctx, '#3a2010', 13,3, 2,5, s);
-  // Face
+  px(ctx, '#2a1810', 1,3, 2,5, s);
+  px(ctx, '#2a1810', 13,3, 2,5, s);
+  // Face (warm skin)
   px(ctx, '#f5c8a8', 3,3, 10,5, s);
-  // Face highlight
   px(ctx, '#fdd8b8', 5,4, 4,2, s);
-  // Eyes - white
+  // Eyes
   px(ctx, '#fff', dir > 0 ? 9 : 4, 4, 4, 3, s);
-  // Eyes - iris (brown)
   px(ctx, '#6a4020', dir > 0 ? 10 : 5, 5, 2, 2, s);
-  // Eye highlight
   px(ctx, '#fff', dir > 0 ? 11 : 5, 4, 1, 1, s);
-  // Eyebrow
-  px(ctx, '#3a2010', dir > 0 ? 9 : 4, 3, 4, 1, s);
-  // Eyelashes
-  px(ctx, '#222', dir > 0 ? 9 : 4, 4, 4, 1, s);
+  px(ctx, '#2a1810', dir > 0 ? 9 : 4, 3, 4, 1, s); // eyebrow
+  px(ctx, '#222', dir > 0 ? 9 : 4, 4, 4, 1, s);   // eyelashes
   // Nose
   px(ctx, '#e0a880', dir > 0 ? 11 : 4, 5, 1, 2, s);
   // Smile
@@ -42,19 +37,24 @@ function drawMariceSprite(ctx, frame = 0, dir = 1, scale = 2) {
   // Blush
   px(ctx, '#f0a0a0', 3,6, 2,1, s);
   px(ctx, '#f0a0a0', 11,6, 2,1, s);
-  // Blue scarf
-  px(ctx, '#4a7ab5', 3,8, 10,2, s);
-  px(ctx, '#5a8ac5', 5,8, 6,1, s); // scarf highlight
-  px(ctx, '#3a6aa5', 2,9, 2,2, s); // scarf tail
+  // Blue scarf with subtle plaid (blue/white/darker)
+  px(ctx, '#4a7ab5', 3,8, 10,2, s);   // base blue
+  px(ctx, '#5a8ac5', 5,8, 6,1, s);   // highlight
+  px(ctx, '#3a6aa5', 2,8, 1,2, s);    // plaid line
+  px(ctx, '#6a9ad5', 6,8, 1,2, s);
+  px(ctx, '#3a6aa5', 9,8, 1,2, s);
+  px(ctx, '#e8e8f0', 4,9, 2,1, s);   // light plaid
+  px(ctx, '#e8e8f0', 8,9, 2,1, s);
+  px(ctx, '#3a6aa5', 2,9, 2,2, s);   // scarf tail
   px(ctx, '#3a6aa5', 12,9, 2,2, s);
-  // White coat
-  px(ctx, '#eee', 3,10, 10,6, s);
-  px(ctx, '#fff', 5,10, 6,4, s); // coat front highlight
-  // Coat buttons
+  // White coat (clear light silhouette)
+  px(ctx, '#f5f5f5', 3,10, 10,6, s);
+  px(ctx, '#fff', 5,10, 6,4, s);     // coat front highlight
+  // Coat buttons (blue to match scarf)
   px(ctx, '#4a7ab5', 7,11, 2,1, s);
   px(ctx, '#4a7ab5', 7,13, 2,1, s);
   // Coat belt/waist
-  px(ctx, '#ddd', 3,14, 10,1, s);
+  px(ctx, '#e8e8e8', 3,14, 10,1, s);
   // Arms
   const armY = frame === 1 ? 11 : 10;
   px(ctx, '#eee', dir > 0 ? 1 : 13, armY, 2, 5, s);
@@ -106,14 +106,14 @@ function drawBeatriceSprite(ctx, frame = 0, dir = 1, scale = 2) {
   // Whisker dots
   px(ctx, '#333', 5,8, 1,1, s);
   px(ctx, '#333', 10,8, 1,1, s);
-  // White chest/neck (distinctive white bib)
-  px(ctx, '#f0f0f0', 5,9, 6,4, s);
-  px(ctx, '#fff', 6,9, 4,3, s); // bright white center
+  // White chest/neck (distinctive white bib - high contrast)
+  px(ctx, '#fff', 4,8, 8,5, s);   // bright white bib (wider, taller)
+  px(ctx, '#f8f8f8', 5,9, 6,4, s); // inner highlight
   // Body (black, sleek)
   px(ctx, '#1a1a1a', 3,9, 10,8, s);
-  // Re-draw white bib on top
-  px(ctx, '#f0f0f0', 5,9, 6,4, s);
-  px(ctx, '#fff', 6,10, 4,2, s);
+  // Re-draw white bib on top so it reads as "white neck"
+  px(ctx, '#fff', 4,8, 8,5, s);
+  px(ctx, '#f0f0f0', 5,9, 6,3, s);
   // Body highlight
   px(ctx, '#2a2a2a', 4,13, 8,2, s);
   // Tail (curling up on side)
@@ -160,9 +160,10 @@ function drawAliceSprite(ctx, frame = 0, dir = 1, scale = 2) {
   // Eye highlight
   px(ctx, '#fff', dir > 0 ? 9 : 4, 4, 1, 1, s);
   px(ctx, '#fff', dir > 0 ? 4 : 9, 4, 1, 1, s);
-  // DISTINCTIVE BLACK NOSE MARK (Alice's signature feature)
-  px(ctx, '#222', 6,7, 4,2, s); // big dark nose mark
-  px(ctx, '#111', 7,7, 2,1, s); // nose center
+  // DISTINCTIVE BLACK NOSE MARK (Alice's signature feature - reads clearly at scale)
+  px(ctx, '#1a1a1a', 5,7, 6,2, s); // wider dark nose mark
+  px(ctx, '#111', 6,7, 4,2, s);     // nose center (darker)
+  px(ctx, '#000', 7,7, 2,1, s);     // center dot
   // Whisker dots
   px(ctx, '#aaa', 4,8, 1,1, s);
   px(ctx, '#aaa', 11,8, 1,1, s);
@@ -228,22 +229,26 @@ function drawOliveSprite(ctx, frame = 0, dir = 1, scale = 2) {
   // Whisker dots
   px(ctx, '#999', 4,8, 1,1, s);
   px(ctx, '#999', 11,8, 1,1, s);
-  // Fluffy chest ruff (lighter)
+  // Fluffy chest ruff (lighter - more pronounced)
+  px(ctx, '#e0d4c0', 3,9, 10,5, s);  // wide chest fluff
   px(ctx, '#d8c8b0', 4,9, 8,4, s);
-  px(ctx, '#e0d0b8', 5,9, 6,3, s); // extra fluff highlight
+  px(ctx, '#fff8f0', 5,9, 6,3, s);   // extra fluff highlight
   // Body (fluffy grey/tabby)
   px(ctx, '#b0a090', 3,9, 10,8, s);
   // Re-draw fluffy chest
-  px(ctx, '#d8c8b0', 4,9, 8,4, s);
-  px(ctx, '#e0d0b8', 5,10, 6,2, s);
-  // Tabby stripes on body
+  px(ctx, '#e0d4c0', 3,9, 10,5, s);
+  px(ctx, '#d8c8b0', 4,10, 6,2, s);
+  // Tabby stripes on body (more visible)
   px(ctx, '#8a7a6a', 3,13, 2,2, s);
   px(ctx, '#8a7a6a', 7,14, 2,2, s);
   px(ctx, '#8a7a6a', 11,13, 2,2, s);
+  px(ctx, '#7a6a5a', 5,12, 2,1, s);
+  px(ctx, '#7a6a5a', 9,13, 2,1, s);
   // Fluffy tail (big and bushy!)
   px(ctx, '#b0a090', dir > 0 ? 0 : 13, 9, 3, 7, s);
   px(ctx, '#c8b898', dir > 0 ? 0 : 14, 10, 2, 4, s); // tail highlight
-  px(ctx, '#8a7a6a', dir > 0 ? 0 : 13, 9, 1, 2, s); // tail stripe
+  px(ctx, '#8a7a6a', dir > 0 ? 0 : 13, 9, 1, 3, s);  // tail stripe
+  px(ctx, '#a09080', dir > 0 ? 0 : 12, 11, 2, 4, s); // extra fluff
   // Legs (fluffy)
   const legOff = frame === 1 ? 1 : 0;
   px(ctx, '#b0a090', 3+legOff, 17, 4, 5, s);
@@ -377,7 +382,7 @@ function drawTile(ctx, tileId, x, y) {
       ctx.fill();
       break;
     case T.DOOR:
-      // Cat door / exit
+      // Cat door / exit (paw icon pulses so exit is easy to spot)
       ctx.fillStyle = '#6a5a4a';
       ctx.fillRect(x+4, y+2, s-8, s-2);
       ctx.fillStyle = '#5a4a3a';
@@ -385,11 +390,14 @@ function drawTile(ctx, tileId, x, y) {
       // Cat flap
       ctx.fillStyle = '#8a7a6a';
       ctx.fillRect(x+8, y+s/2, s-16, s/2-2);
-      // Paw print icon
+      // Paw print icon (subtle pulse)
+      const pulse = 0.8 + 0.2 * Math.sin((typeof performance !== 'undefined' ? performance.now() : Date.now()) * 0.002);
+      ctx.globalAlpha = pulse;
       ctx.fillStyle = '#c8a060';
       ctx.beginPath();
       ctx.arc(x+s/2, y+s/3, 4, 0, Math.PI*2);
       ctx.fill();
+      ctx.globalAlpha = 1;
       break;
     case T.COIN:
       // Fish treat

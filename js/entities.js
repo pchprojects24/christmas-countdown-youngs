@@ -51,7 +51,7 @@ class Entity {
       if (this.vy > 0) {
         if (ONE_WAY_TILES.has(col.tile)) {
           // One-way: only land if entity was above the platform top last frame
-          if (prevBottom <= col.tileY * TILE + 4) { // 4px tolerance: must have been above platform
+          if (prevBottom <= col.tileY * TILE + 8) { // 8px tolerance: reliable landing on one-way
             this.y = col.tileY * TILE - this.h;
             this.vy = 0;
             this.onGround = true;

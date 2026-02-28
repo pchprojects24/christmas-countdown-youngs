@@ -213,6 +213,12 @@ class Game {
     this.particles.clear();
     this.camX = 0;
 
+    // Clear any previous goal hint
+    if (this._goalHintTimeout) clearTimeout(this._goalHintTimeout);
+    this._goalHintTimeout = null;
+    const hintEl = document.getElementById('goal-hint');
+    if (hintEl) hintEl.classList.remove('visible');
+
     // Spawn enemies
     for (const ed of data.enemies) {
       const ex = ed.tx * TILE;
@@ -236,6 +242,20 @@ class Game {
     for (const cd of data.coins) {
       this.coins.push(new Coin(cd.tx * TILE, cd.ty * TILE));
     }
+
+    // Show goal hint on door levels (Living Room, Kitchen)
+    if (idx === 0 || idx === 1) this._showGoalHint();
+  }
+
+  _showGoalHint() {
+    const hintEl = document.getElementById('goal-hint');
+    if (!hintEl) return;
+    hintEl.classList.add('visible');
+    if (this._goalHintTimeout) clearTimeout(this._goalHintTimeout);
+    this._goalHintTimeout = setTimeout(() => {
+      hintEl.classList.remove('visible');
+      this._goalHintTimeout = null;
+    }, 5000);
   }
 
   // ===== HUD =====

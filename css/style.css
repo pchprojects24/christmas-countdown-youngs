@@ -145,9 +145,32 @@ body {
 
 /* ===== GAME SCREEN ===== */
 #screen-game {
+  position: relative;
   flex-direction: column;
   gap: 0;
   background: #1a1410;
+}
+
+.goal-hint {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(12px, 2.5vw, 16px);
+  color: #f0a860;
+  text-shadow: 0 1px 2px #000;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+.goal-hint.visible {
+  opacity: 1;
+  animation: goalHintPulse 2s ease-in-out infinite;
+}
+@keyframes goalHintPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
 }
 
 #hud {

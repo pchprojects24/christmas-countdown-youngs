@@ -31,7 +31,7 @@ class Level {
 
   getTileCollisions(entity) {
     const cols = [];
-    const margin = 2;
+    const margin = 1;
     const x1 = Math.floor((entity.left + margin) / TILE);
     const x2 = Math.floor((entity.right - margin - 1) / TILE);
     const y1 = Math.floor((entity.top + margin) / TILE);
@@ -331,10 +331,10 @@ function createLevel1() {
   const rows = [];
   for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  // Row 22-24: Main hardwood floor (3 small pits to add challenge)
-  rows[22] = buildRow(W, [[0,8,T.GROUND],[11,27,T.GROUND],[30,46,T.GROUND],[49,65,T.GROUND],[68,79,T.GROUND]]);
-  rows[23] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,65,T.DIRT],[68,79,T.DIRT]]);
-  rows[24] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,65,T.DIRT],[68,79,T.DIRT]]);
+  // Row 22-24: Main hardwood floor (3 small pits to add challenge; generous run to door)
+  rows[22] = buildRow(W, [[0,8,T.GROUND],[11,27,T.GROUND],[30,46,T.GROUND],[49,66,T.GROUND],[68,79,T.GROUND]]);
+  rows[23] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,66,T.DIRT],[68,79,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,66,T.DIRT],[68,79,T.DIRT]]);
 
   // Row 19-20: Lower shelves (solid - first step up, 3 tiles above floor)
   rows[19] = buildRow(W, [[1,8,T.SHELF],[12,20,T.SHELF],[30,38,T.SHELF],[44,53,T.SHELF],[58,67,T.SHELF],[71,79,T.SHELF]]);
@@ -360,7 +360,8 @@ function createLevel1() {
   rows[21][50] = T.VEGE;
   rows[21][69] = T.VEGE;
 
-  // Cat door exit (row 21, far right)
+  // Cat door exit (row 21, far right) - 2 tiles wide for easy fit
+  rows[21][76] = T.DOOR;
   rows[21][77] = T.DOOR;
 
   return {
@@ -376,7 +377,7 @@ function createLevel1() {
       { type: ENEMY_TYPES.SHYGUY, tx: 47, ty: 21, color: 'pink' },
       { type: ENEMY_TYPES.SNIFIT, tx: 57, ty: 21 },
       { type: ENEMY_TYPES.NINJI,  tx: 66, ty: 15 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 74, ty: 21, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 70, ty: 21, color: 'green' },
     ],
     vegetables: [
       // Floor level (ty=22 so player can grab while standing on floor)
@@ -450,6 +451,7 @@ function createLevel2() {
   rows[21][58] = T.VEGE;
   rows[21][77] = T.VEGE;
 
+  rows[21][86] = T.DOOR;
   rows[21][87] = T.DOOR;
 
   return {
@@ -466,7 +468,7 @@ function createLevel2() {
       { type: ENEMY_TYPES.SNIFIT,  tx: 58, ty: 21 },
       { type: ENEMY_TYPES.SHYGUY, tx: 67, ty: 21, color: 'pink' },
       { type: ENEMY_TYPES.NINJI,   tx: 77, ty: 15 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 84, ty: 21, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 81, ty: 21, color: 'green' },
     ],
     vegetables: [
       // Floor level (ty=22)

@@ -1,7 +1,7 @@
 // ===== PLAYER =====
 class Player extends Entity {
   constructor(x, y, charKey) {
-    super(x, y, 28, 40);
+    super(x, y, 24, 36);
     this.charKey = charKey;
     this.cfg = CHARACTERS[charKey];
 
