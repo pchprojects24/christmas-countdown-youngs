@@ -331,80 +331,65 @@ function createLevel1() {
   const rows = [];
   for (let r = 0; r < H; r++) rows.push(makeRow(W));
 
-  // Row 22-24: Main hardwood floor (3 small pits to add challenge; generous run to door)
-  rows[22] = buildRow(W, [[0,8,T.GROUND],[11,27,T.GROUND],[30,46,T.GROUND],[49,66,T.GROUND],[68,79,T.GROUND]]);
-  rows[23] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,66,T.DIRT],[68,79,T.DIRT]]);
-  rows[24] = buildRow(W, [[0,8,T.DIRT],[11,27,T.DIRT],[30,46,T.DIRT],[49,66,T.DIRT],[68,79,T.DIRT]]);
+  // Row 22-24: Main hardwood floor with two short pits (clear run to exit)
+  rows[22] = buildRow(W, [[0,20,T.GROUND],[24,48,T.GROUND],[52,79,T.GROUND]]);
+  rows[23] = buildRow(W, [[0,20,T.DIRT],[24,48,T.DIRT],[52,79,T.DIRT]]);
+  rows[24] = buildRow(W, [[0,20,T.DIRT],[24,48,T.DIRT],[52,79,T.DIRT]]);
 
-  // Row 19-20: Lower shelves (solid - first step up, 3 tiles above floor)
-  rows[19] = buildRow(W, [[1,8,T.SHELF],[12,20,T.SHELF],[30,38,T.SHELF],[44,53,T.SHELF],[58,67,T.SHELF],[71,79,T.SHELF]]);
-  rows[20] = buildRow(W, [[1,8,T.DIRT],[12,20,T.DIRT],[30,38,T.DIRT],[44,53,T.DIRT],[58,67,T.DIRT],[71,79,T.DIRT]]);
+  // Row 18: Low shelves (single tile thick for generous headroom)
+  rows[18] = buildRow(W, [[10,16,T.SHELF],[30,36,T.SHELF],[50,58,T.SHELF],[66,75,T.SHELF]]);
 
-  // Row 16: Cloud cushions (one-way - jump through from below, 3 tiles above row 19)
-  rows[16] = buildRow(W, [[0,7,T.CLOUD],[14,22,T.CLOUD],[32,41,T.CLOUD],[47,56,T.CLOUD],[62,70,T.CLOUD]]);
+  // Row 14: Cloud cushions (one-way, spaced for easy climbing)
+  rows[14] = buildRow(W, [[14,18,T.CLOUD],[34,40,T.CLOUD],[54,60,T.CLOUD]]);
 
-  // Row 13-14: Mid shelves (solid, 3 tiles above cloud row 16)
-  rows[13] = buildRow(W, [[4,12,T.SHELF],[20,29,T.SHELF],[37,46,T.SHELF],[53,62,T.SHELF],[67,76,T.SHELF]]);
-  rows[14] = buildRow(W, [[4,12,T.DIRT],[20,29,T.DIRT],[37,46,T.DIRT],[53,62,T.DIRT],[67,76,T.DIRT]]);
-
-  // Row 10: High cloud cushions (one-way, 3 tiles above row 13)
-  rows[10] = buildRow(W, [[8,16,T.CLOUD],[26,35,T.CLOUD],[44,53,T.CLOUD],[61,70,T.CLOUD]]);
-
-  // Row 7-8: Top shelves (solid, 3 tiles above row 10)
-  rows[7] = buildRow(W, [[14,22,T.SHELF],[37,47,T.SHELF],[58,67,T.SHELF]]);
-  rows[8] = buildRow(W, [[14,22,T.DIRT],[37,47,T.DIRT],[58,67,T.DIRT]]);
+  // Row 10: Upper shelves (small islands for optional pickups)
+  rows[10] = buildRow(W, [[22,27,T.SHELF],[42,47,T.SHELF],[60,66,T.SHELF]]);
 
   // Treat spot visual markers (row 21, one tile above floor surface)
-  rows[21][4] = T.VEGE;
-  rows[21][16] = T.VEGE;
-  rows[21][50] = T.VEGE;
-  rows[21][69] = T.VEGE;
+  rows[21][6]  = T.VEGE;
+  rows[21][28] = T.VEGE;
+  rows[21][54] = T.VEGE;
+  rows[21][72] = T.VEGE;
 
   // Cat door exit (row 21, far right) - 2 tiles wide for easy fit
-  rows[21][76] = T.DOOR;
   rows[21][77] = T.DOOR;
+  rows[21][78] = T.DOOR;
 
   return {
     tiles: rows,
     name: 'Living Room',
     theme: 'livingroom',
     bgColor: '#e8d8c0', bgColor2: '#d0c0a8',
-    spawnX: 2, spawnY: 20,
+    spawnX: 2, spawnY: 19,
     enemies: [
-      { type: ENEMY_TYPES.SHYGUY, tx: 13, ty: 21, color: 'red' },
-      { type: ENEMY_TYPES.SHYGUY, tx: 24, ty: 21, color: 'blue' },
-      { type: ENEMY_TYPES.NINJI,  tx: 36, ty: 18 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 47, ty: 21, color: 'pink' },
-      { type: ENEMY_TYPES.SNIFIT, tx: 57, ty: 21 },
-      { type: ENEMY_TYPES.NINJI,  tx: 66, ty: 15 },
-      { type: ENEMY_TYPES.SHYGUY, tx: 70, ty: 21, color: 'green' },
+      { type: ENEMY_TYPES.SHYGUY, tx: 18, ty: 21, color: 'red' },
+      { type: ENEMY_TYPES.SNIFIT, tx: 36, ty: 21 },
+      { type: ENEMY_TYPES.NINJI,  tx: 52, ty: 17 },
+      { type: ENEMY_TYPES.SHYGUY, tx: 64, ty: 21, color: 'green' },
     ],
     vegetables: [
       // Floor level (ty=22 so player can grab while standing on floor)
-      { tx: 4,  ty: 22, type: 'yarn' },
-      { tx: 16, ty: 22, type: 'mouse' },
-      { tx: 50, ty: 22, type: 'feather' },
-      { tx: 69, ty: 22, type: 'yarn' },
-      // Lower shelf level (ty=19)
-      { tx: 3,  ty: 19, type: 'mouse' },
-      { tx: 15, ty: 19, type: 'yarn' },
-      { tx: 33, ty: 19, type: 'feather' },
-      { tx: 47, ty: 19, type: 'yarn' },
-      { tx: 62, ty: 19, type: 'mouse' },
-      // Mid shelf level (ty=13)
-      { tx: 7,  ty: 13, type: 'feather' },
-      { tx: 24, ty: 13, type: 'yarn' },
-      { tx: 42, ty: 13, type: 'mouse' },
+      { tx: 6,  ty: 22, type: 'yarn' },
+      { tx: 28, ty: 22, type: 'mouse' },
+      { tx: 54, ty: 22, type: 'feather' },
+      { tx: 72, ty: 22, type: 'yarn' },
+      // Low shelf level (ty=18 with clear headroom)
+      { tx: 12, ty: 18, type: 'mouse' },
+      { tx: 34, ty: 18, type: 'yarn' },
+      { tx: 57, ty: 18, type: 'feather' },
+      // Upper shelf level (ty=10)
+      { tx: 23, ty: 10, type: 'yarn' },
+      { tx: 61, ty: 10, type: 'mouse' },
     ],
     coins: [
-      // Coins floating above lower shelves (invites jumping up)
-      {tx:4,ty:17},{tx:5,ty:17},{tx:6,ty:17},
-      {tx:14,ty:17},{tx:15,ty:17},{tx:16,ty:17},
-      {tx:32,ty:17},{tx:33,ty:17},
-      {tx:46,ty:17},{tx:47,ty:17},
-      // Coins above high clouds
-      {tx:28,ty:8},{tx:29,ty:8},
-      {tx:47,ty:8},{tx:48,ty:8},
+      // Coins guiding along the safe path and up to optional platforms
+      {tx:8,ty:20},{tx:9,ty:20},{tx:10,ty:20},
+      {tx:26,ty:20},{tx:27,ty:20},
+      {tx:44,ty:20},{tx:45,ty:20},
+      {tx:62,ty:20},{tx:63,ty:20},
+      // Coins above clouds
+      {tx:34,ty:12},{tx:35,ty:12},
+      {tx:54,ty:12},{tx:55,ty:12},
     ]
   };
 }
